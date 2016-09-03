@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.*?>
+<?import java.lang.*?>
+<?import javafx.scene.layout.*?>
+
+
+<Pane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="162.0" prefWidth="312.0" xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1">
+   <children>
+      <CheckBox layoutX="83.0" layoutY="41.0" mnemonicParsing="false" text="Start" />
+      <Button fx:id="okBtn" layoutX="246.0" layoutY="123.0" mnemonicParsing="false" text="OK" />
+      <CheckBox layoutX="83.0" layoutY="73.0" mnemonicParsing="false" text="Final" />
+   </children>
+</Pane>

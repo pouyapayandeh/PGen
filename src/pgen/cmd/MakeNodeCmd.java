@@ -1,4 +1,7 @@
-package pgen;
+package pgen.cmd;
+
+import pgen.model.GraphModel;
+import pgen.model.NodeModel;
 
 /**
  * Created by Pouya Payandeh on 7/23/2016.
@@ -18,7 +21,7 @@ public class MakeNodeCmd implements Command
     @Override
     public void apply()
     {
-        graphModel.nodes.add(new NodeModel(x,y));
+        graphModel.getNodes().add(new NodeModel(x,y));
     }
 
     @Override

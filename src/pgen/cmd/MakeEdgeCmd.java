@@ -1,4 +1,7 @@
-package pgen;
+package pgen.cmd;
+
+import pgen.model.EdgeModel;
+import pgen.model.NodeModel;
 
 /**
  * Created by Pouya Payandeh on 7/23/2016.
@@ -17,11 +20,12 @@ public class MakeEdgeCmd implements Command
     public void apply()
     {
         edge = new EdgeModel(start , end);
-        start.adjacent.add(edge);
+        start.getAdjacent().add(edge);
 
     }
 
     @Override
+
     public void rollBack()
     {
 
