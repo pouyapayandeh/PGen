@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.*?>
+<?import java.lang.*?>
+<?import javafx.scene.layout.*?>
+
+<Pane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="162.0" prefWidth="312.0" xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1">
+   <children>
+      <Button fx:id="okBtn" layoutX="270.0" layoutY="123.0" mnemonicParsing="false" text="OK" />
+      <Label layoutX="31.0" layoutY="47.0" text="Token" />
+      <TextField fx:id="tokenText" layoutX="69.0" layoutY="43.0" />
+      <Label layoutX="33.0" layoutY="87.0" text="Func" />
+      <TextField fx:id="funcText" layoutX="69.0" layoutY="83.0" />
+      <CheckBox fx:id="globalChk" layoutX="229.0" layoutY="87.0" mnemonicParsing="false" text="Global" />
+      <CheckBox fx:id="graphChk" layoutX="229.0" layoutY="47.0" mnemonicParsing="false" text="Graph" />
+   </children>
+</Pane>

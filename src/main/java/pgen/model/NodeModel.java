@@ -15,6 +15,12 @@ public class NodeModel
     StringProperty name;
     DoubleProperty x = new SimpleDoubleProperty();
 
+    List<EdgeModel> adjacent = new ArrayList<>();
+    DoubleProperty y = new SimpleDoubleProperty();
+    BooleanProperty final_ = new SimpleBooleanProperty(false);
+    GraphModel graph;
+    int id;
+
     public double getX()
     {
         return x.get();
@@ -50,9 +56,7 @@ public class NodeModel
         this.final_.set(final_);
     }
 
-    DoubleProperty y = new SimpleDoubleProperty();
-    BooleanProperty final_ = new SimpleBooleanProperty(false);
-    int id;
+
 
     public int getId()
     {
@@ -64,18 +68,28 @@ public class NodeModel
         this.id = id;
     }
 
-    public NodeModel(double x, double y)
+    public NodeModel(double x, double y, GraphModel graph)
     {
         this.x.setValue(x);
         this.y.setValue(y);
+        this.graph = graph;
         id=_id++;
     }
 
-    BooleanProperty isStart;
-    List<EdgeModel> adjacent = new ArrayList<>();
+
 
     public List<EdgeModel> getAdjacent()
     {
         return adjacent;
+    }
+
+    public GraphModel getGraph()
+    {
+        return graph;
+    }
+
+    public void setGraph(GraphModel graph)
+    {
+        this.graph = graph;
     }
 }

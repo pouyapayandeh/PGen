@@ -8,11 +8,17 @@ import javafx.scene.input.KeyEvent;
 import javafx.scene.layout.AnchorPane;
 import javafx.scene.layout.VBox;
 import javafx.stage.DirectoryChooser;
+import javafx.stage.FileChooser;
 import pgen.cmd.CommandManager;
+import pgen.graphics.MessageAlert;
 import pgen.model.GraphModel;
 import pgen.service.ExportService;
+import pgen.service.LLParser;
+import pgen.service.Message;
+import pgen.service.SaveLoadService;
 
 import java.io.File;
+import java.util.List;
 import java.util.Optional;
 
 public class Controller
@@ -27,6 +33,12 @@ public class Controller
     public VBox mainContainer;
     @FXML
     public MenuItem exportMenuItem;
+    @FXML
+    public MenuItem checkMenuItem;
+    @FXML
+    public MenuItem saveMenuItem;
+    @FXML
+    public MenuItem loadMenuItem;
 
     DrawPaneController drawPaneController;
 
@@ -35,9 +47,9 @@ public class Controller
     {
         drawPaneController = new DrawPaneController(pane);
         CommandManager.init(drawPaneController);
-        GraphModel graph = new GraphModel("1");
+        GraphModel graph = new GraphModel("MAIN");
         drawPaneController.graph = graph;
-        list.getItems().addAll(graph, new GraphModel("2"));
+        list.getItems().addAll(graph);
         list.getSelectionModel().selectedItemProperty().addListener((observable, oldValue, newValue) ->
         {
             drawPaneController.graph = newValue;
@@ -94,6 +106,46 @@ public class Controller
 //        list.setContextMenu();
         mainContainer.addEventHandler(KeyEvent.KEY_PRESSED,this::onKeyPressed);
         exportMenuItem.setOnAction(this::export);
+        saveMenuItem.setOnAction(this::save);
+        loadMenuItem.setOnAction(this::load);
+        checkMenuItem.setOnAction(this::check);
+    }
+
+    private void check(ActionEvent actionEvent)
+    {
+        LLParser parser = new LLParser();
+        List<Message> msgs = parser.check(list.getItems());
+        String msg = msgs.stream().map(message -> message.getMessage() + "\n").reduce(String::concat).get();
+        MessageAlert alert = new MessageAlert(Alert.AlertType.ERROR,msg);
+        alert.showAndWait();
+    }
+
+    private void load(ActionEvent actionEvent)
+    {
+        FileChooser chooser = new FileChooser();
+        chooser.setTitle("JavaFX Projects");
+        File selectedFile = chooser.showOpenDialog(pane.getScene().getWindow());
+        if(selectedFile != null)
+        {
+            SaveLoadService exportService = new SaveLoadService(selectedFile);
+            exportService.load(list);
+            drawPaneController.graph  = list.getItems().get(0);
+            drawPaneController.refresh();
+        }
+    }
+
+    private void save(ActionEvent actionEvent)
+    {
+        FileChooser chooser = new FileChooser();
+        chooser.setTitle("JavaFX Projects");
+        File selectedFile = chooser.showSaveDialog(pane.getScene().getWindow());
+        if(selectedFile != null)
+        {
+            SaveLoadService exportService = new SaveLoadService(selectedFile);
+            exportService.save(list.getItems());
+
+
+        }
     }
 
     private void export(ActionEvent actionEvent)
@@ -117,6 +169,10 @@ public class Controller
             if (keyEvent.getCode().equals(KeyCode.N))
             {
                 list.getItems().addAll(new GraphModel("2"));
+            }
+            if(keyEvent.getCode().equals(KeyCode.Z))
+            {
+                CommandManager.getInstance().rollBack();
             }
         }
     }

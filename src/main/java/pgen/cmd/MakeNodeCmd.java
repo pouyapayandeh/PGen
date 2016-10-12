@@ -21,7 +21,7 @@ public class MakeNodeCmd implements Command
     @Override
     public void apply()
     {
-        graphModel.getNodes().add(new NodeModel(x,y));
+        graphModel.getNodes().add(new NodeModel(x,y,graphModel));
     }
 
     @Override

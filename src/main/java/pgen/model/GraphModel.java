@@ -36,6 +36,17 @@ public class GraphModel
 
     StringProperty name;
     List<NodeModel> nodes = new ArrayList<NodeModel>();
+    NodeModel start = null;
+
+    public NodeModel getStart()
+    {
+        return start;
+    }
+
+    public void setStart(NodeModel start)
+    {
+        this.start = start;
+    }
 
     public List<NodeModel> getNodes()
     {

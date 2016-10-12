@@ -19,9 +19,11 @@ public class MakeEdgeCmd implements Command
     @Override
     public void apply()
     {
-        edge = new EdgeModel(start , end);
-        start.getAdjacent().add(edge);
-
+        if(start != end)
+        {
+            edge = new EdgeModel(start, end);
+            start.getAdjacent().add(edge);
+        }
     }
 
     @Override

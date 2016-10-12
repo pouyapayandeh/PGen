@@ -34,7 +34,7 @@ public class DrawPaneController implements RefreshableController
             for(EdgeModel edge : nodeModel.getAdjacent())
             {
                 BoundLine line = new BoundLine(edge);
-                pane.getChildren().addAll(line , line.getAnchor(),line.getText());
+                pane.getChildren().addAll(line , line.getAnchor(),line.getText(),line.getArrowEnd());
             }
         }
 
@@ -61,7 +61,7 @@ public class DrawPaneController implements RefreshableController
             cmd = new MakeEdgeCmd(firstNode,node);
             cmd.apply();
             refresh();
-            firstNode = null;
+            firstNode = node;
             System.out.println("new Edge");
         }
         System.out.println(node.getId());

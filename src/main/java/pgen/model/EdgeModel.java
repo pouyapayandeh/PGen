@@ -1,9 +1,6 @@
 package pgen.model;
 
-import javafx.beans.property.DoubleProperty;
-import javafx.beans.property.SimpleDoubleProperty;
-import javafx.beans.property.SimpleStringProperty;
-import javafx.beans.property.StringProperty;
+import javafx.beans.property.*;
 
 /**
  * Created by Pouya Payandeh on 7/23/2016.
@@ -12,7 +9,9 @@ public class EdgeModel
 {
     NodeModel start , end;
     StringProperty token,func;
-
+    BooleanProperty graph,global;
+    DoubleProperty anchorX;
+    DoubleProperty anchorY;
     public NodeModel getEnd()
     {
         return end;
@@ -33,8 +32,7 @@ public class EdgeModel
         this.start = start;
     }
 
-    DoubleProperty anchorX;
-    DoubleProperty anchorY;
+
 
     public String getFunc()
     {
@@ -66,6 +64,36 @@ public class EdgeModel
         this.token.set(token);
     }
 
+    public boolean getGraph()
+    {
+        return graph.get();
+    }
+
+    public BooleanProperty graphProperty()
+    {
+        return graph;
+    }
+
+    public void setGraph(boolean graph)
+    {
+        this.graph.set(graph);
+    }
+
+    public boolean getGlobal()
+    {
+        return global.get();
+    }
+
+    public BooleanProperty globalProperty()
+    {
+        return global;
+    }
+
+    public void setGlobal(boolean global)
+    {
+        this.global.set(global);
+    }
+
     public EdgeModel(NodeModel start, NodeModel end)
     {
         this.start = start;
@@ -75,6 +103,8 @@ public class EdgeModel
         anchorY = new SimpleDoubleProperty((start.y.get() + end.y.get()) /2);
         token = new SimpleStringProperty("");
         func = new SimpleStringProperty("");
+        graph = new SimpleBooleanProperty(false);
+        global = new SimpleBooleanProperty(false);
     }
 
     public double getAnchorX()

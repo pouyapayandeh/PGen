@@ -1,5 +1,6 @@
 package pgen.graphics;
 
+import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
 import javafx.geometry.Bounds;
 import javafx.geometry.Pos;
@@ -15,6 +16,8 @@ import javafx.scene.shape.Circle;
 import javafx.scene.shape.StrokeType;
 import javafx.scene.text.Text;
 import javafx.scene.text.TextBoundsType;
+import pgen.cmd.CommandManager;
+import pgen.cmd.DeleteNodeCmd;
 import pgen.model.NodeModel;
 
 /**
@@ -45,7 +48,7 @@ public class GraphNode extends StackPane
         this.node = n;
         circle = new Circle(n.getX(), n.getY(), radius);
 
-        circle.setFill(color.deriveColor(1, 1, 1, 0.5));
+        circle.setFill(color.deriveColor(1, 1, 1,1));
         circle.setStroke(color);
         circle.setStrokeWidth(2);
         circle.setStrokeType(StrokeType.OUTSIDE);
@@ -62,7 +65,7 @@ public class GraphNode extends StackPane
                 circle.setStroke(Color.BLACK);
             }else
             {
-                circle.setStroke(Color.BISQUE);
+                circle.setStroke(color);
             }
         });
         text = new Text(String.valueOf(n.getId()));
@@ -70,7 +73,7 @@ public class GraphNode extends StackPane
         getChildren().addAll(circle, text);
         setAlignment(Pos.CENTER);
         //  setPrefSize(30,30);
-        setStyle("-fx-background-color:crimson");
+//        setStyle("-fx-background-color:crimson");
 
         enableDrag();
         setMouseTransparent(false);
@@ -162,18 +165,29 @@ public class GraphNode extends StackPane
             }
         });
     }
-
+    ContextMenu contextMenu = new ContextMenu();
     private void showContextMenu(MouseEvent event)
     {
 
-        ContextMenu contextMenu = new ContextMenu();
         MenuItem deleteBtn = new MenuItem("Delete");
+
+        deleteBtn.setOnAction(this::delete);
         CheckMenuItem finalBtn = new CheckMenuItem("Final");
         finalBtn.selectedProperty().set(node.getFinal());
         node.finalProperty().bind(finalBtn.selectedProperty());
+
         CheckMenuItem startBtn = new CheckMenuItem("Start");
+        startBtn.setOnAction(event1 -> {
+            node.getGraph().setStart(node);
+        });
+        contextMenu.getItems().clear();
         contextMenu.getItems().addAll(deleteBtn, finalBtn, startBtn);
         contextMenu.show(this, event.getScreenX(), event.getScreenY());
+    }
+
+    private void delete(ActionEvent actionEvent)
+    {
+        CommandManager.getInstance().applyCommand(new DeleteNodeCmd(node));
     }
 
 }
