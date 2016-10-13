@@ -58,14 +58,21 @@ public class GraphNode extends StackPane
         n.xProperty().bind(layoutXProperty().add(radius));
         n.yProperty().bind(layoutYProperty().add(radius));
 
+        if(n.getFinal())
+        {
+            circle.setFill(Color.RED);
+        }else
+        {
+            circle.setFill(color.deriveColor(1, 1, 1,1));
+        }
         n.finalProperty().addListener((observable, oldValue, newValue) ->
         {
             if(newValue)
             {
-                circle.setStroke(Color.BLACK);
+                circle.setFill(Color.RED);
             }else
             {
-                circle.setStroke(color);
+                circle.setFill(color.deriveColor(1, 1, 1,1));
             }
         });
         text = new Text(String.valueOf(n.getId()));

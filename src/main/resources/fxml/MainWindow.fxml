@@ -30,7 +30,10 @@
       <SplitPane dividerPositions="1.0" VBox.vgrow="ALWAYS">
         <items>
           <ListView fx:id="list" maxWidth="200" prefWidth="200" />
-          <AnchorPane fx:id="pane" minHeight="0.0" minWidth="0.0" prefHeight="160.0" />
+            <ScrollPane fx:id="scrollpane">
+                <AnchorPane fx:id="pane" minHeight="0.0" minWidth="0.0" prefHeight="5000" prefWidth="5000" />
+            </ScrollPane>
+
         </items>
       </SplitPane>
    </children>

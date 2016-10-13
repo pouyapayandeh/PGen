@@ -9,7 +9,7 @@ public class NodeJSON
 {
     double x,y;
     int id;
-    boolean isStart,isFinal;
+    boolean isFinal;
     public NodeJSON(NodeModel n)
     {
         x=n.getX();

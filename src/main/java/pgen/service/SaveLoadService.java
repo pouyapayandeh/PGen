@@ -63,6 +63,8 @@ public class SaveLoadService
                     nodes.put(node.getId() , node);
                     graphModel.getNodes().add(node);
                 });
+                if(graph.start != -1)
+                    graphModel.setStart( graphModel.getNodes().stream().filter(nodeJSON -> nodeJSON.getId()==graph.start).findFirst().get());
                 graph.edges.forEach(edgeJSON ->
                 {
                     NodeModel start = nodes.get(edgeJSON.start);
@@ -72,6 +74,7 @@ public class SaveLoadService
                     edge.setToken(edgeJSON.token);
                     edge.anchorXProperty().setValue(edgeJSON.anchorX);
                     edge.anchorYProperty().setValue(edgeJSON.anchorY);
+                    edge.setGraph(edgeJSON.isGraph);
                     start.getAdjacent().add(edge);
 
                 });

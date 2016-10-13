@@ -1,10 +1,12 @@
 package pgen.controller;
 
 import javafx.event.ActionEvent;
+import javafx.event.EventHandler;
 import javafx.fxml.FXML;
 import javafx.scene.control.*;
 import javafx.scene.input.KeyCode;
 import javafx.scene.input.KeyEvent;
+import javafx.scene.input.ScrollEvent;
 import javafx.scene.layout.AnchorPane;
 import javafx.scene.layout.VBox;
 import javafx.stage.DirectoryChooser;
@@ -39,6 +41,7 @@ public class Controller
     public MenuItem saveMenuItem;
     @FXML
     public MenuItem loadMenuItem;
+    public ScrollPane scrollpane;
 
     DrawPaneController drawPaneController;
 
@@ -47,6 +50,25 @@ public class Controller
     {
         drawPaneController = new DrawPaneController(pane);
         CommandManager.init(drawPaneController);
+//        final double SCALE_DELTA = 1.1;
+//        scrollpane.setOnScroll(new EventHandler<ScrollEvent>() {
+//        @Override public void handle(ScrollEvent event) {
+//            if(event.isControlDown())
+//            {
+//                event.consume();
+//
+//
+//                double scaleFactor =
+//                        (event.getDeltaY() > 0)
+//                                ? SCALE_DELTA
+//                                : 1 / SCALE_DELTA;
+//
+//                pane.setScaleX(pane.getScaleX() * scaleFactor);
+//                pane.setScaleY(pane.getScaleY() * scaleFactor);
+//                drawPaneController.refresh();
+//            }
+//        }
+//    });
         GraphModel graph = new GraphModel("MAIN");
         drawPaneController.graph = graph;
         list.getItems().addAll(graph);
@@ -105,6 +127,7 @@ public class Controller
 //
 //        list.setContextMenu();
         mainContainer.addEventHandler(KeyEvent.KEY_PRESSED,this::onKeyPressed);
+        mainContainer.addEventHandler(KeyEvent.KEY_RELEASED,event -> drawPaneController.firstNode =null);
         exportMenuItem.setOnAction(this::export);
         saveMenuItem.setOnAction(this::save);
         loadMenuItem.setOnAction(this::load);
@@ -118,12 +141,23 @@ public class Controller
         String msg = msgs.stream().map(message -> message.getMessage() + "\n").reduce(String::concat).get();
         MessageAlert alert = new MessageAlert(Alert.AlertType.ERROR,msg);
         alert.showAndWait();
+        FileChooser chooser = new FileChooser();
+        chooser.setTitle("JavaFX Projects");
+        chooser.getExtensionFilters().addAll(
+                new FileChooser.ExtensionFilter("npt File","*.npt"));
+        File selectedFile = chooser.showSaveDialog(pane.getScene().getWindow());
+        if(selectedFile != null)
+        {
+            parser.buildTable(list.getItems(),selectedFile);
+        }
     }
 
     private void load(ActionEvent actionEvent)
     {
         FileChooser chooser = new FileChooser();
         chooser.setTitle("JavaFX Projects");
+        chooser.getExtensionFilters().addAll(
+            new FileChooser.ExtensionFilter("PGEN Save File","*.pgs"));
         File selectedFile = chooser.showOpenDialog(pane.getScene().getWindow());
         if(selectedFile != null)
         {
@@ -138,13 +172,13 @@ public class Controller
     {
         FileChooser chooser = new FileChooser();
         chooser.setTitle("JavaFX Projects");
+        chooser.getExtensionFilters().addAll(
+                new FileChooser.ExtensionFilter("PGEN Save File","*.pgs"));
         File selectedFile = chooser.showSaveDialog(pane.getScene().getWindow());
         if(selectedFile != null)
         {
             SaveLoadService exportService = new SaveLoadService(selectedFile);
             exportService.save(list.getItems());
-
-
         }
     }
 
@@ -152,6 +186,7 @@ public class Controller
     {
         DirectoryChooser chooser = new DirectoryChooser();
         chooser.setTitle("JavaFX Projects");
+
         File selectedDirectory = chooser.showDialog(pane.getScene().getWindow());
         if(selectedDirectory != null)
         {

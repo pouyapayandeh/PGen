@@ -112,7 +112,6 @@ public class BoundLine extends QuadCurve
         arrowEnd.getElements().add(new LineTo(ori.getX(), ori.getY()));
         arrowEnd.getElements().add(new LineTo(ori.getX() - 0.2 * tan.getX() + 0.2 * tan.getY(),
                 ori.getY() - 0.2 * tan.getY() - 0.2 * tan.getX()));
-
     }
 
     public void calCurve(ObservableValue<? extends Number> observable, Number oldValue, Number newValue)

@@ -1,9 +1,6 @@
 package pgen.service;
 
-import javafx.beans.property.DoubleProperty;
-import javafx.beans.property.StringProperty;
 import pgen.model.EdgeModel;
-import pgen.model.NodeModel;
 
 /**
  * Created by Pouya Payandeh on 9/6/2016.
@@ -14,6 +11,7 @@ public class EdgeJSON
     String token,func;
     double anchorX;
     double anchorY;
+    boolean isGraph;
 
     public EdgeJSON()
     {
@@ -26,6 +24,7 @@ public class EdgeJSON
         func = model.getFunc();
         anchorX = model.getAnchorX();
         anchorY = model.getAnchorY();
+        isGraph = model.getGraph();
     }
 
 }

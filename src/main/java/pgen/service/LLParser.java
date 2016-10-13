@@ -4,6 +4,9 @@ import pgen.model.EdgeModel;
 import pgen.model.GraphModel;
 import pgen.model.NodeModel;
 
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.PrintWriter;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -34,63 +37,148 @@ public class LLParser
         woStart.
                 forEach(graph -> messages.add(new Message(Message.ERROR, String.format("Graph %s doesn't have start Node", graph.getName()))));
 
-        messages.add(new Message(Message.INFO,""));
+        messages.add(new Message(Message.INFO, ""));
         return messages;
     }
-    public void buildTable(List<GraphModel> graphs)
+
+    public void buildTable(List<GraphModel> graphs, File file)
     {
-        Set<String> tokens = graphs.stream().
+        ArrayList<String> tokens = new ArrayList<>(graphs.stream().
                 flatMap(graph -> graph.getEdges().stream()).filter(edge -> !edge.getGraph()).
-                map(EdgeModel::getToken).collect(Collectors.toSet());
-        tokens.add("$");
+                map(EdgeModel::getToken).collect(Collectors.toSet()));
+        tokens.add(0, "$");
 
         Set<String> vars = graphs.stream().
                 flatMap(graph -> graph.getEdges().stream()).filter(edge -> edge.getGraph()).
                 map(EdgeModel::getToken).collect(Collectors.toSet());
 
 
-        Map<String , GraphModel> varGraph = new HashMap<>();
+        Map<String, GraphModel> varGraph = getVarGraphs(graphs, vars);
 
-        for (String s : vars)
-        {
-            for (GraphModel g:graphs)
-            {
-                if(g.getName().equals(s))
-                {
-                    varGraph.put(s ,g);
-                            break;
-                }
-            }
-        }
-        
+        Map<String, Set<String>> firsts = getFirstSets(varGraph);
         List<NodeModel> nodes = graphs.stream().
                 flatMap(graphModel -> graphModel.getNodes().stream()).collect(Collectors.toList());
 
-        for(int i = 0  ; i < nodes.size() ; i++)
+        for (int i = 0; i < nodes.size(); i++)
         {
-            nodes.get(i).setId(i+1);
+            nodes.get(i).setId(i);
         }
-        Map<String , Integer>  tokensInt = new HashMap<>();
+        Map<String, Integer> tokensInt = new HashMap<>();
 
 
-        int seti = 0 ;
-        for( String s : tokens)
+        int seti = 0;
+        for (String s : tokens)
         {
-            tokensInt.put(s,seti);
+            tokensInt.put(s, seti);
             seti++;
         }
 
-        String[][] table = new String[nodes.size() + 1][ tokens.size()];
+        for (String s : vars)
+        {
+            tokensInt.put(s, seti);
+            seti++;
+        }
+        int tw = tokens.size() + vars.size();
+        LLCell[][] table = new LLCell[nodes.size()][tw];
+        for (int i = 0; i < table.length; i++)
+            for (int j = 0; j < table[0].length; j++)
+                table[i][j] = new LLCell(LLCell.ERROR, -1, "");
+
+        for (GraphModel graphModel : graphs)
+        {
+
+
+            graphModel.getNodes().stream().filter(NodeModel::getFinal).
+                    forEach(nodeModel -> {
+                        for (int i = 0; i < table[nodeModel.getId()].length; i++)
+                            table[nodeModel.getId()][i] = new LLCell(LLCell.RETURN, tokensInt.get(graphModel.getName()), "");
+                    });
+            if (graphModel.getName().equals("MAIN"))
+                graphModel.getNodes().stream().filter(NodeModel::getFinal).
+                        forEach(nodeModel -> table[nodeModel.getId()][0] = new LLCell(LLCell.ACCEPT,-1, ""));
+
+        }
         nodes.stream().forEach(node -> {
             node.getAdjacent().forEach(edge -> {
-                if(edge.getGraph())
+                if (edge.getGraph())
                 {
-
-                }else
+                    table[node.getId()][tokensInt.get(edge.getToken())] = new LLCell(LLCell.GOTO, edge.getEnd().getId(), edge.getFunc());
+                    Set<String> first = firsts.get(edge.getToken());
+                    first.forEach(s -> table[node.getId()][tokensInt.get(s)] = new LLCell(LLCell.PUSH_GOTO, varGraph.get(edge.getToken()).getStart().getId(), ""));
+                } else
                 {
-                    table[node.getId()][tokensInt.get(edge.getToken())] = String.valueOf(edge.getEnd().getId());
+                    table[node.getId()][tokensInt.get(edge.getToken())] = new LLCell(LLCell.SHIFT, edge.getEnd().getId(), edge.getFunc());
                 }
             });
         });
+
+        try (PrintWriter writer = new PrintWriter(file))
+        {
+            writer.printf("%d %d\n", nodes.size(), tw);
+            List<String> list = tokensInt.keySet().stream().sorted((o1, o2) -> tokensInt.get(o1) - tokensInt.get(o2)).collect(Collectors.toList());
+            list.forEach(s -> writer.printf("%s ", s));
+            writer.println();
+            for (LLCell[] llCells : table)
+            {
+                for (LLCell llCell : llCells)
+                {
+                    writer.print(llCell + " ");
+                }
+                writer.println();
+            }
+            writer.println();
+        } catch (FileNotFoundException e)
+        {
+            e.printStackTrace();
+        }
+
+
+    }
+
+    private Map<String, GraphModel> getVarGraphs(List<GraphModel> graphs, Set<String> vars)
+    {
+        Map<String, GraphModel> varGraph = new HashMap<>();
+
+        for (String s : vars)
+        {
+            for (GraphModel g : graphs)
+            {
+                if (g.getName().equals(s))
+                {
+                    varGraph.put(s, g);
+                    break;
+                }
+            }
+        }
+        return varGraph;
+    }
+
+    public Map<String, Set<String>> getFirstSets(Map<String, GraphModel> varGraph)
+    {
+        Map<String, Set<String>> firsts = new HashMap<>();
+        for (Map.Entry<String, GraphModel> entry : varGraph.entrySet())
+        {
+            firsts.put(entry.getKey(), entry.getValue().getStart().getAdjacent().stream().filter(edgeModel -> !edgeModel.getGraph())
+                    .map(EdgeModel::getToken).collect(Collectors.toSet()));
+        }
+        boolean flag = true;
+        while (flag)
+        {
+            flag = false;
+            for (Map.Entry<String, GraphModel> entry : varGraph.entrySet())
+            {
+                for (EdgeModel edge : entry.getValue().getEdges())
+                {
+                    if (edge.getGraph())
+                    {
+                        Set<String> first = firsts.get(entry.getKey());
+                        Set<String> first2 = firsts.get(edge.getToken());
+                        if (first.addAll(first2))
+                            flag = true;
+                    }
+                }
+            }
+        }
+        return firsts;
     }
 }
