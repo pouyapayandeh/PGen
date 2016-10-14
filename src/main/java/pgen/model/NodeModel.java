@@ -57,7 +57,10 @@ public class NodeModel
     }
 
 
-
+    public static void setCounter(int _id)
+    {
+        NodeModel._id=_id;
+    }
     public int getId()
     {
         return id;

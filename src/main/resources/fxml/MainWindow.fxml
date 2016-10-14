@@ -20,7 +20,6 @@
         <menus>
           <Menu mnemonicParsing="false" text="File">
             <items>
-              <MenuItem mnemonicParsing="false" text="Close" />
                   <MenuItem fx:id="saveMenuItem" mnemonicParsing="false" text="Save" />
                   <MenuItem fx:id="loadMenuItem" mnemonicParsing="false" text="Load" />
                   <MenuItem fx:id="exportMenuItem" mnemonicParsing="false" text="Export" />
@@ -28,7 +27,8 @@
           </Menu>
             <Menu mnemonicParsing="false" text="Parser">
               <items>
-                <MenuItem fx:id="checkMenuItem" mnemonicParsing="false" text="Check" />
+                  <MenuItem mnemonicParsing="false" text="Renumber" onAction="#renumber"/>
+                  <MenuItem fx:id="checkMenuItem" mnemonicParsing="false" text="Check" />
               </items>
             </Menu>
             <Menu mnemonicParsing="false" text="Help">

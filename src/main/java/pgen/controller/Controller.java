@@ -19,6 +19,7 @@ import javafx.stage.Stage;
 import pgen.cmd.CommandManager;
 import pgen.graphics.MessageAlert;
 import pgen.model.GraphModel;
+import pgen.model.NodeModel;
 import pgen.service.ExportService;
 import pgen.service.LLParser;
 import pgen.service.Message;
@@ -29,6 +30,7 @@ import java.io.IOException;
 import java.net.URL;
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 public class Controller
 {
@@ -218,18 +220,18 @@ public class Controller
 
     public void aboutMenu(ActionEvent actionEvent)
     {
-        showModal(getClass().getResource("/fxml/AboutPage.fxml"),"About");
+        showModal(getClass().getResource("/fxml/AboutPage.fxml"), "About");
 
 
     }
 
     public void licenseMenu(ActionEvent actionEvent)
     {
-        showModal(getClass().getResource("/fxml/LicensePage.fxml"),"License");
+        showModal(getClass().getResource("/fxml/LicensePage.fxml"), "License");
 
     }
 
-    private void showModal(URL resource,String title)
+    private void showModal(URL resource, String title)
     {
         final FXMLLoader loader = new FXMLLoader(resource);
 
@@ -247,5 +249,17 @@ public class Controller
         {
             e.printStackTrace();
         }
+    }
+
+    public void renumber(ActionEvent actionEvent)
+    {
+        List<NodeModel> nodes = list.getItems().stream().
+                flatMap(graphModel -> graphModel.getNodes().stream()).collect(Collectors.toList());
+        for (int i = 0; i < nodes.size(); i++)
+        {
+            nodes.get(i).setId(i);
+        }
+        NodeModel.setCounter(nodes.size());
+        drawPaneController.refresh();
     }
 }

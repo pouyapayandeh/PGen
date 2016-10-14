@@ -80,6 +80,8 @@ public class SaveLoadService
                 });
                 list.getItems().add(graphModel);
             });
+            NodeModel.setCounter(list.getItems().stream().
+                    flatMap(graphModel -> graphModel.getNodes().stream()).map(NodeModel::getId).max(Integer::compareTo).get()+1);
 
         } catch (FileNotFoundException e)
         {

@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.text.*?>
+<?import javafx.scene.image.*?>
+<?import javafx.scene.control.*?>
+<?import java.lang.*?>
+<?import javafx.scene.layout.*?>
+
+
+<AnchorPane fx:id="pane"  maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="400.0" prefWidth="302.0" xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1"  fx:controller="pgen.controller.aboutController">
+   <children>
+      <ImageView fitHeight="81.0" fitWidth="91.0" layoutX="31.0" layoutY="69.0" pickOnBounds="true" preserveRatio="true">
+         <image>
+            <Image url="@Icon.png" />
+         </image>
+      </ImageView>
+      <Label layoutX="58.0" layoutY="14.0" text="Shahid Beheshti University">
+         <font>
+            <Font size="16.0" />
+         </font>
+      </Label>
+      <Label layoutX="124.0" layoutY="69.0" text="PGen Version" />
+      <Label layoutX="217.0" layoutY="70.0" text="3.0.0 Beta" />
+      <Label layoutX="124.0" layoutY="93.0" text="Syntax Graph Parser Generator" />
+      <Label layoutX="31.0" layoutY="257.0" text="Written By" />
+      <Label layoutX="104.0" layoutY="257.0" text="Pouya Payandeh" />
+      <Label layoutX="104.0" layoutY="282.0" text="pouya.payandeh@gmail.com" />
+      <Label layoutX="31.0" layoutY="192.0" text="Professor" />
+      <Label layoutX="103.0" layoutY="192.0" text="Ghassem Jaberipur" />
+      <Button layoutX="137.0" layoutY="361.0" mnemonicParsing="false" onAction="#close" text="OK" />
+   </children>
+</AnchorPane>

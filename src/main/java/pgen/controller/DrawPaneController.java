@@ -1,5 +1,6 @@
 package pgen.controller;
 
+import javafx.scene.input.MouseButton;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.Pane;
 import pgen.model.EdgeModel;
@@ -69,9 +70,12 @@ public class DrawPaneController implements RefreshableController
 
     private void mouseClickEvent(MouseEvent mouseEvent)
     {
-        Command cmd = null;
-        cmd = new MakeNodeCmd(graph, mouseEvent.getX(), mouseEvent.getY());
-        cmd.apply();
-        refresh();
+        if(mouseEvent.getButton().equals(MouseButton.PRIMARY))
+        {
+            Command cmd = null;
+            cmd = new MakeNodeCmd(graph, mouseEvent.getX(), mouseEvent.getY());
+            cmd.apply();
+            refresh();
+        }
     }
 }

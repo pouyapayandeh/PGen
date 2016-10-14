@@ -16,6 +16,8 @@ import javafx.scene.shape.*;
 import javafx.scene.text.Text;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
+import pgen.cmd.CommandManager;
+import pgen.cmd.DeleteEdgeCmd;
 import pgen.model.EdgeModel;
 import pgen.controller.EdgePropertiesController;
 
@@ -38,7 +40,7 @@ public class BoundLine extends QuadCurve
         startYProperty().bind(startY);
         endXProperty().bind(endX);
         endYProperty().bind(endY);
-        setStroke(Color.FORESTGREEN);
+        setStroke(Color.RED);
         setStrokeWidth(4);
         setStrokeLineCap(StrokeLineCap.ROUND);
         setFill(Color.CORNSILK.deriveColor(0, 1.2, 1, 0));
@@ -81,7 +83,9 @@ public class BoundLine extends QuadCurve
 
         contextMenu.getItems().addAll(deleteBtn,propertiesBtn);
         propertiesBtn.setOnAction(event -> showPropertiesDialog());
-
+        deleteBtn.setOnAction(event -> {
+            CommandManager.getInstance().applyCommand(new DeleteEdgeCmd(edge));
+        });
         text.setOnMousePressed(event ->
         {
 
@@ -109,7 +113,6 @@ public class BoundLine extends QuadCurve
     {
         double size = Math.max(getBoundsInLocal().getWidth(),
                 getBoundsInLocal().getHeight());
-        double scale = size / 4d;
         Point2D ori = eval(this, 0.9f);
         Point2D tan = evalDt(this, 0.9f).normalize().multiply(50);
 
@@ -125,7 +128,6 @@ public class BoundLine extends QuadCurve
     public void calCurve(ObservableValue<? extends Number> observable, Number oldValue, Number newValue)
     {
 
-        double yy = edge.getAnchorY() - (getEndY() + getStartY()) / 2;
 
         double x1 = 2*edge.getAnchorX() - getStartX()/2 - getEndX()/2;
         double y1 = 2*edge.getAnchorY() - getStartY()/2 - getEndY()/2;
@@ -169,25 +171,6 @@ public class BoundLine extends QuadCurve
     }
 
     /**
-     * Evaluate the cubic curve at a parameter 0<=t<=1, returns a Point2D
-     *
-     * @param c the CubicCurve
-     * @param t param between 0 and 1
-     * @return a Point2D
-     */
-    private Point2D eval(CubicCurve c, float t)
-    {
-        Point2D p = new Point2D(Math.pow(1 - t, 3) * c.getStartX() +
-                3 * t * Math.pow(1 - t, 2) * c.getControlX1() +
-                3 * (1 - t) * t * t * c.getControlX2() +
-                Math.pow(t, 3) * c.getEndX(),
-                Math.pow(1 - t, 3) * c.getStartY() +
-                        3 * t * Math.pow(1 - t, 2) * c.getControlY1() +
-                        3 * (1 - t) * t * t * c.getControlY2() +
-                        Math.pow(t, 3) * c.getEndY());
-        return p;
-    }
-    /**
      * Evaluate the quad curve at a parameter 0<=t<=1, returns a Point2D
      *
      * @param c the QuadCurve
@@ -202,29 +185,6 @@ public class BoundLine extends QuadCurve
                 Math.pow(1 - t, 2) * c.getStartY() +
                         2 * t * (1 - t) * c.getControlY() +
                         Math.pow(t, 2) * c.getEndY());
-        return p;
-    }
-
-
-
-
-    /**
-     * Evaluate the tangent of the cubic curve at a parameter 0<=t<=1, returns a Point2D
-     *
-     * @param c the CubicCurve
-     * @param t param between 0 and 1
-     * @return a Point2D
-     */
-    private Point2D evalDt(CubicCurve c, float t)
-    {
-        Point2D p = new Point2D(-3 * Math.pow(1 - t, 2) * c.getStartX() +
-                3 * (Math.pow(1 - t, 2) - 2 * t * (1 - t)) * c.getControlX1() +
-                3 * ((1 - t) * 2 * t - t * t) * c.getControlX2() +
-                3 * Math.pow(t, 2) * c.getEndX(),
-                -3 * Math.pow(1 - t, 2) * c.getStartY() +
-                        3 * (Math.pow(1 - t, 2) - 2 * t * (1 - t)) * c.getControlY1() +
-                        3 * ((1 - t) * 2 * t - t * t) * c.getControlY2() +
-                        3 * Math.pow(t, 2) * c.getEndY());
         return p;
     }
 

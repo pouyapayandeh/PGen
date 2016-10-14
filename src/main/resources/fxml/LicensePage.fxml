@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.TextArea?>
+<?import javafx.scene.layout.AnchorPane?>
+
+
+<AnchorPane fx:id="pane" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="361.0" prefWidth="490.0" xmlns="http://javafx.com/javafx/8.0.60" xmlns:fx="http://javafx.com/fxml/1"  fx:controller="pgen.controller.licenseController">
+   <children>
+      <TextArea editable="false" layoutX="30.0" layoutY="28.0" prefHeight="291.0" prefWidth="433.0" text="    Syntax Graph Parser Generator(PGEN) is a software program for generating&#10;   parse tables of Syntax Graphs&#10;    Copyright (C) 2016  Pouya Payandeh&#10;&#10;    This program is free software: you can redistribute it and/or modify&#10;    it under the terms of the GNU General Public License as published by&#10;    the Free Software Foundation, either version 3 of the License, or&#10;    (at your option) any later version.&#10;&#10;    This program is distributed in the hope that it will be useful,&#10;    but WITHOUT ANY WARRANTY; without even the implied warranty of&#10;    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the&#10;    GNU General Public License for more details.&#10;&#10;    You should have received a copy of the GNU General Public License&#10;    along with this program.  If not, see &lt;http://www.gnu.org/licenses/&gt;." />
+      <Button layoutX="230.0" layoutY="327.0" mnemonicParsing="false" text="OK" onAction="#close" />
+   </children>
+</AnchorPane>
