@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.TextArea?>
+<?import javafx.scene.layout.AnchorPane?>
+
+
+<AnchorPane fx:id="pane" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="422.0" prefWidth="419.0" xmlns="http://javafx.com/javafx/8.0.60" xmlns:fx="http://javafx.com/fxml/1" fx:controller="pgen.controller.helpController">
+   <children>
+      <TextArea layoutX="22.0" layoutY="20.0" prefHeight="353.0" prefWidth="375.0" editable="false" text="Hold &lt;Shift&gt; to make connections between nodes&#10;&#10;Right Click on edge's name for deleting or changing parameteres&#10;" />
+      <Button layoutX="193.0" layoutY="383.0" mnemonicParsing="false" text="OK" onAction="#close" />
+   </children>
+</AnchorPane>

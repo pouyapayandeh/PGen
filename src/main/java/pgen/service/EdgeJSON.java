@@ -12,6 +12,7 @@ public class EdgeJSON
     double anchorX;
     double anchorY;
     boolean isGraph;
+    boolean isGlobal;
 
     public EdgeJSON()
     {
@@ -25,6 +26,7 @@ public class EdgeJSON
         anchorX = model.getAnchorX();
         anchorY = model.getAnchorY();
         isGraph = model.getGraph();
+        isGlobal = model.getGlobal();
     }
 
 }

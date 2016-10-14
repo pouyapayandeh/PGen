@@ -7,6 +7,7 @@ import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.PrintWriter;
 import java.util.List;
+import java.util.stream.Collectors;
 
 /**
  * Created by Pouya Payandeh on 9/5/2016.
@@ -32,22 +33,38 @@ public class ExportService
             {
                 if(!edgeModel.getFunc().equals(""))
                 {
-                    funcs+= String.format(FUNCTION_TEMPLATE,edgeModel.getFunc());
+                    if(!edgeModel.getGlobal())
+                        funcs+= String.format(FUNCTION_TEMPLATE,edgeModel.getFunc());
                 }
             }
             String output = String.format(CLASS_TEMPLATE,graphModel.getName(),funcs);
-            try
-            {
-                PrintWriter writer = new PrintWriter(dir.getPath()+graphModel.getName()+".java");
-                System.out.println("File created");
-                writer.print(output);
-                writer.close();
-            } catch (FileNotFoundException e)
-            {
-                e.printStackTrace();
-            }
+            makeFile(output,graphModel.getName());
 
         }
+        List<String > globalfunc = graphs.stream().flatMap(graphModel -> graphModel.getEdges().stream()).filter(EdgeModel::getGlobal).map(EdgeModel::getFunc).collect(Collectors.toList());
+        String gfuncs = "";
+        for(String func : globalfunc)
+        {
+            if(!func.equals(""))
+            {
+                    gfuncs+= String.format(FUNCTION_TEMPLATE,func);
+            }
+        }
+        String output = String.format(CLASS_TEMPLATE,"Global",gfuncs);
+        makeFile(output,"Global");
+    }
 
+    private void makeFile(String data,String fileName)
+    {
+        try
+        {
+            PrintWriter writer = new PrintWriter(dir.getPath()+fileName+".java");
+            System.out.println("File created");
+            writer.print(data);
+            writer.close();
+        } catch (FileNotFoundException e)
+        {
+            e.printStackTrace();
+        }
     }
 }

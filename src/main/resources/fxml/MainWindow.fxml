@@ -22,19 +22,21 @@
             <items>
                   <MenuItem fx:id="saveMenuItem" mnemonicParsing="false" text="Save" />
                   <MenuItem fx:id="loadMenuItem" mnemonicParsing="false" text="Load" />
-                  <MenuItem fx:id="exportMenuItem" mnemonicParsing="false" text="Export" />
+
             </items>
           </Menu>
             <Menu mnemonicParsing="false" text="Parser">
               <items>
                   <MenuItem mnemonicParsing="false" text="Renumber" onAction="#renumber"/>
-                  <MenuItem fx:id="checkMenuItem" mnemonicParsing="false" text="Check" />
+                  <MenuItem fx:id="checkMenuItem" mnemonicParsing="false" text="Build Table" />
+                  <MenuItem fx:id="exportMenuItem" mnemonicParsing="false" text="Export Functions" />
               </items>
             </Menu>
             <Menu mnemonicParsing="false" text="Help">
               <items>
                 <MenuItem fx:id="aboutMenuItem" mnemonicParsing="false" onAction="#aboutMenu" text="About" />
                   <MenuItem mnemonicParsing="false" text="License" onAction="#licenseMenu" />
+                  <MenuItem mnemonicParsing="false" text="Manual" onAction="#manualMenu" />
               </items>
             </Menu>
         </menus>

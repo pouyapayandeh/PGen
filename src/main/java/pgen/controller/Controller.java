@@ -136,17 +136,6 @@ public class Controller
     private void check(ActionEvent actionEvent)
     {
         LLParser parser = new LLParser();
-        List<Message> msgs = parser.check(list.getItems());
-        if (msgs.size() > 0)
-        {
-            String msg = msgs.stream().map(message -> message.getMessage() + "\n").reduce(String::concat).get();
-            MessageAlert alert = new MessageAlert(Alert.AlertType.ERROR, msg, "");
-            alert.showAndWait();
-        } else
-        {
-            MessageAlert alert = new MessageAlert(Alert.AlertType.INFORMATION, "s", "");
-            alert.showAndWait();
-        }
         FileChooser chooser = new FileChooser();
         chooser.setTitle("JavaFX Projects");
         chooser.getExtensionFilters().addAll(
@@ -154,7 +143,18 @@ public class Controller
         File selectedFile = chooser.showSaveDialog(pane.getScene().getWindow());
         if (selectedFile != null)
         {
-            parser.buildTable(list.getItems(), selectedFile);
+            List<Message> msgs = parser.buildTable(list.getItems(), selectedFile);
+            if (msgs.size() > 0)
+            {
+                String msg = msgs.stream().map(message -> message.getMessage() + "\n").reduce(String::concat).get();
+                MessageAlert alert = new MessageAlert(Alert.AlertType.ERROR, msg, "Error");
+                alert.showAndWait();
+            } else
+            {
+                MessageAlert alert = new MessageAlert(Alert.AlertType.INFORMATION, "", "Success");
+                alert.showAndWait();
+            }
+
         }
     }
 
@@ -198,13 +198,14 @@ public class Controller
         {
             ExportService exportService = new ExportService(selectedDirectory);
             exportService.exportGraphs(list.getItems());
+            MessageAlert alert = new MessageAlert(Alert.AlertType.INFORMATION, "", "Success");
+            alert.showAndWait();
 
         }
     }
 
     private void onKeyPressed(KeyEvent keyEvent)
     {
-        System.out.println("YO");
         if (keyEvent.isControlDown())
         {
             if (keyEvent.getCode().equals(KeyCode.N))
@@ -261,5 +262,10 @@ public class Controller
         }
         NodeModel.setCounter(nodes.size());
         drawPaneController.refresh();
+    }
+
+    public void manualMenu(ActionEvent actionEvent)
+    {
+        showModal(getClass().getResource("/fxml/HelpPage.fxml"), "Help");
     }
 }

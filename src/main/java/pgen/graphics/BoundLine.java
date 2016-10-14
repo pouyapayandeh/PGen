@@ -40,7 +40,7 @@ public class BoundLine extends QuadCurve
         startYProperty().bind(startY);
         endXProperty().bind(endX);
         endYProperty().bind(endY);
-        setStroke(Color.RED);
+        setStroke(Color.ORANGE);
         setStrokeWidth(4);
         setStrokeLineCap(StrokeLineCap.ROUND);
         setFill(Color.CORNSILK.deriveColor(0, 1.2, 1, 0));
@@ -65,7 +65,7 @@ public class BoundLine extends QuadCurve
         endYProperty().addListener(this::calCurve);
 
 
-        anchor = new Anchor(Color.BLUE, edge.anchorXProperty(), edge.anchorYProperty(), 3);
+        anchor = new Anchor(Color.BLUE, edge.anchorXProperty(), edge.anchorYProperty(), 5);
 
         anchor.setExternalMouse(() ->{ calCurve(null, 0, 0);calArrow(null, 0, 0);});
         this.edge = edge;
@@ -88,11 +88,8 @@ public class BoundLine extends QuadCurve
         });
         text.setOnMousePressed(event ->
         {
-
                 contextMenu.show(this, event.getScreenX(), event.getScreenY());
-                //
-
-            event.consume();
+                event.consume();
         });
         text.setOnMouseReleased(Event::consume);
     }
@@ -102,17 +99,10 @@ public class BoundLine extends QuadCurve
         return arrowEnd;
     }
 
-    public void refresh(ObservableValue<? extends Number> observable, Number oldValue, Number newValue)
-    {
-
-        calArrow(null, 0, 0);
-        calCurve(null, 0, 0);
-    }
 
     public void calArrow(ObservableValue<? extends Number> observable, Number oldValue, Number newValue)
     {
-        double size = Math.max(getBoundsInLocal().getWidth(),
-                getBoundsInLocal().getHeight());
+
         Point2D ori = eval(this, 0.9f);
         Point2D tan = evalDt(this, 0.9f).normalize().multiply(50);
 

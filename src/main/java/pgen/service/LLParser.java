@@ -15,7 +15,7 @@ import java.util.stream.Collectors;
  */
 public class LLParser
 {
-    public List<Message> check(List<GraphModel> graphs)
+    private List<Message> check(List<GraphModel> graphs)
     {
         List<Message> messages = new ArrayList<>();
         Set<String> extractExpectedGraphs = graphs.stream().flatMap(graph -> graph.getEdges().stream()).
@@ -43,6 +43,7 @@ public class LLParser
 
     public List<Message> buildTable(List<GraphModel> graphs, File file)
     {
+        List<Message> msgs = check(graphs);
         ArrayList<String> tokens = new ArrayList<>(graphs.stream().
                 flatMap(graph -> graph.getEdges().stream()).filter(edge -> !edge.getGraph()).
                 map(EdgeModel::getToken).collect(Collectors.toSet()));
@@ -98,41 +99,52 @@ public class LLParser
                         forEach(nodeModel -> table[nodeModel.getId()][0] = new LLCell(LLCell.ACCEPT,-1, ""));
 
         }
+
         nodes.stream().forEach(node -> {
             node.getAdjacent().forEach(edge -> {
                 if (edge.getGraph())
                 {
                     table[node.getId()][tokensInt.get(edge.getToken())] = new LLCell(LLCell.GOTO, edge.getEnd().getId(), edge.getFunc());
                     Set<String> first = firsts.get(edge.getToken());
-                    first.forEach(s -> table[node.getId()][tokensInt.get(s)] = new LLCell(LLCell.PUSH_GOTO, varGraph.get(edge.getToken()).getStart().getId(), ""));
+                    first.forEach(s ->
+                    {
+                        if(table[node.getId()][tokensInt.get(s)].action==LLCell.PUSH_GOTO ||
+                                table[node.getId()][tokensInt.get(s)].action==LLCell.SHIFT)
+                            msgs.add(new Message(Message.ERROR,String.format("First Set Collision in node %d and token \"%s\"",node.getId(),s)));
+                        table[node.getId()][tokensInt.get(s)] = new LLCell(LLCell.PUSH_GOTO, varGraph.get(edge.getToken()).getStart().getId(), "");
+                    });
                 } else
                 {
+                    if(table[node.getId()][tokensInt.get(edge.getToken())].action==LLCell.PUSH_GOTO ||
+                            table[node.getId()][tokensInt.get(edge.getToken())].action==LLCell.SHIFT)
+                        msgs.add(new Message(Message.ERROR,String.format("First Set Collision in node %d and token \"%s\"",node.getId(),edge.getToken())));
                     table[node.getId()][tokensInt.get(edge.getToken())] = new LLCell(LLCell.SHIFT, edge.getEnd().getId(), edge.getFunc());
                 }
             });
         });
-
-        try (PrintWriter writer = new PrintWriter(file))
+        if(msgs.size() ==0)
         {
-            writer.printf("%d %d\n", nodes.size(), tw);
-            List<String> list = tokensInt.keySet().stream().sorted((o1, o2) -> tokensInt.get(o1) - tokensInt.get(o2)).collect(Collectors.toList());
-            list.forEach(s -> writer.printf("%s ", s));
-            writer.println();
-            for (LLCell[] llCells : table)
+            try (PrintWriter writer = new PrintWriter(file))
             {
-                for (LLCell llCell : llCells)
+                writer.printf("%d %d\n", nodes.size(), tw);
+                List<String> list = tokensInt.keySet().stream().sorted((o1, o2) -> tokensInt.get(o1) - tokensInt.get(o2)).collect(Collectors.toList());
+                list.forEach(s -> writer.printf("%s ", s));
+                writer.println();
+                for (LLCell[] llCells : table)
                 {
-                    writer.print(llCell + " ");
+                    for (LLCell llCell : llCells)
+                    {
+                        writer.print(llCell + " ");
+                    }
+                    writer.println();
                 }
                 writer.println();
+            } catch (FileNotFoundException e)
+            {
+                e.printStackTrace();
             }
-            writer.println();
-        } catch (FileNotFoundException e)
-        {
-            e.printStackTrace();
         }
-
-        return new ArrayList<>();
+        return msgs;
     }
 
     private Map<String, GraphModel> getVarGraphs(List<GraphModel> graphs, Set<String> vars)

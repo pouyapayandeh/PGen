@@ -16,7 +16,7 @@ public class Main extends Application {
         primaryStage.setTitle("PGen");
         primaryStage.getIcons().add(
                 new Image(
-                        Main.class.getResourceAsStream( "/fxml/icon.png" )));
+                        getClass().getResourceAsStream( "/fxml/Icon.png" )));
         primaryStage.setMaximized(true);
         primaryStage.setScene(new Scene(root));
         primaryStage.show();

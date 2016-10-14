@@ -1,8 +1,10 @@
 package pgen.controller;
 
+import javafx.scene.Node;
 import javafx.scene.input.MouseButton;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.Pane;
+import pgen.graphics.Anchor;
 import pgen.model.EdgeModel;
 import pgen.model.GraphModel;
 import pgen.graphics.GraphNode;
@@ -35,7 +37,10 @@ public class DrawPaneController implements RefreshableController
             for(EdgeModel edge : nodeModel.getAdjacent())
             {
                 BoundLine line = new BoundLine(edge);
+
+
                 pane.getChildren().addAll(line , line.getAnchor(),line.getText(),line.getArrowEnd());
+                line.toBack();
             }
         }
 

@@ -14,7 +14,7 @@ import java.util.function.Function;
 /**
  * Created by Pouya Payandeh on 7/10/2016.
  */
-class Anchor extends Circle {
+public class Anchor extends Circle {
     Anchor(Color color, DoubleProperty x, DoubleProperty y, double r) {
         super(x.get(), y.get(), r);
         setFill(color.deriveColor(1, 1, 1, 1));
@@ -22,6 +22,7 @@ class Anchor extends Circle {
         setStrokeWidth(2);
         setStrokeType(StrokeType.OUTSIDE);
 
+        setStyle("-fx-background-color: crimson");
         x.bind(centerXProperty());
         y.bind(centerYProperty());
         enableDrag();
@@ -40,18 +41,19 @@ class Anchor extends Circle {
         setOnMouseClicked(event -> {event.consume();});
         setOnMousePressed(mouseEvent -> {
             // record a delta distance for the drag and drop operation.
+            mouseEvent.consume();
             dragDelta.x = getCenterX() - mouseEvent.getX();
             dragDelta.y = getCenterY() - mouseEvent.getY();
             getScene().setCursor(Cursor.MOVE);
-//            externalMouse.run();
-            mouseEvent.consume();
+
         });
         setOnMouseReleased(mouseEvent -> {
-            getScene().setCursor(Cursor.HAND);
-//            externalMouse.run();
             mouseEvent.consume();
+            getScene().setCursor(Cursor.HAND);
+
         });
         setOnMouseDragged(mouseEvent -> {
+            mouseEvent.consume();
             double newX = mouseEvent.getX() + dragDelta.x;
             if (newX > 0 && newX < getScene().getWidth()) {
                 setCenterX(newX);
@@ -61,7 +63,7 @@ class Anchor extends Circle {
                 setCenterY(newY);
             }
             externalMouse.run();
-            mouseEvent.consume();
+
         });
         setOnMouseEntered(mouseEvent -> {
             if (!mouseEvent.isPrimaryButtonDown()) {
