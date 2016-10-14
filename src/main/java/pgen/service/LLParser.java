@@ -37,11 +37,11 @@ public class LLParser
         woStart.
                 forEach(graph -> messages.add(new Message(Message.ERROR, String.format("Graph %s doesn't have start Node", graph.getName()))));
 
-        messages.add(new Message(Message.INFO, ""));
+     //   messages.add(new Message(Message.INFO, ""));
         return messages;
     }
 
-    public void buildTable(List<GraphModel> graphs, File file)
+    public List<Message> buildTable(List<GraphModel> graphs, File file)
     {
         ArrayList<String> tokens = new ArrayList<>(graphs.stream().
                 flatMap(graph -> graph.getEdges().stream()).filter(edge -> !edge.getGraph()).
@@ -132,7 +132,7 @@ public class LLParser
             e.printStackTrace();
         }
 
-
+        return new ArrayList<>();
     }
 
     private Map<String, GraphModel> getVarGraphs(List<GraphModel> graphs, Set<String> vars)

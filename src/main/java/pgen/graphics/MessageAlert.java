@@ -16,13 +16,13 @@ public class MessageAlert extends Alert
     {
         super(alertType);
     }
-    public MessageAlert(AlertType alertType, String text)
+    public MessageAlert(AlertType alertType, String text,String header)
     {
         super(alertType);
         setTitle("Messages Dialog");
-        setHeaderText("Look, an Exception Dialog");
+        setHeaderText(header);
         setContentText("");
-        Label label = new Label("The exception stacktrace was:");
+        Label label = new Label("");
 
         TextArea textArea = new TextArea(text);
         textArea.setEditable(false);

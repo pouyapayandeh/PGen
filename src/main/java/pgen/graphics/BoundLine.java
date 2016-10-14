@@ -3,11 +3,14 @@ package pgen.graphics;
 import javafx.beans.property.DoubleProperty;
 import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
+import javafx.event.Event;
 import javafx.event.EventType;
 import javafx.fxml.FXMLLoader;
 import javafx.geometry.Point2D;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
+import javafx.scene.control.ContextMenu;
+import javafx.scene.control.MenuItem;
 import javafx.scene.paint.Color;
 import javafx.scene.shape.*;
 import javafx.scene.text.Text;
@@ -68,21 +71,26 @@ public class BoundLine extends QuadCurve
         text.xProperty().bind(edge.anchorXProperty().add(10));
         text.yProperty().bind(edge.anchorYProperty());
 
+        ContextMenu contextMenu = new ContextMenu();
+        MenuItem deleteBtn = new MenuItem("Delete");
+        MenuItem propertiesBtn = new MenuItem("Properties");
+
         calCurve(null, 0, 0);
         calArrow(null, 0, 0);
 
 
+        contextMenu.getItems().addAll(deleteBtn,propertiesBtn);
+        propertiesBtn.setOnAction(event -> showPropertiesDialog());
+
         text.setOnMousePressed(event ->
         {
-            try
-            {
-                showPropertiesDialog();
-            } catch (IOException e)
-            {
-                e.printStackTrace();
-            }
+
+                contextMenu.show(this, event.getScreenX(), event.getScreenY());
+                //
+
             event.consume();
         });
+        text.setOnMouseReleased(Event::consume);
     }
 
     public Path getArrowEnd()
@@ -132,13 +140,20 @@ public class BoundLine extends QuadCurve
         anchor.setCenterY(ori.getY());
 
     }
-    private void showPropertiesDialog() throws java.io.IOException
+    private void showPropertiesDialog()
     {
 
         final FXMLLoader loader = new FXMLLoader(getClass().getResource("/fxml/EdgePropertiesDialog.fxml"));
         EdgePropertiesController controller = new EdgePropertiesController();
         loader.setController(controller);
-        Parent root = loader.load();
+        Parent root = null;
+        try
+        {
+            root = loader.load();
+        } catch (IOException e)
+        {
+            e.printStackTrace();
+        }
         controller.init(edge);
         Scene scene = new Scene(root);
         Stage stage = new Stage();
