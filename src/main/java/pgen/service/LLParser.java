@@ -85,18 +85,18 @@ public class LLParser
             for (int j = 0; j < table[0].length; j++)
                 table[i][j] = new LLCell(LLCell.ERROR, -1, "");
 
-        for (GraphModel graphModel : graphs)
-        {
+        for (GraphModel graphModel : graphs) {
 
-
-            graphModel.getNodes().stream().filter(NodeModel::getFinal).
-                    forEach(nodeModel -> {
-                        for (int i = 0; i < table[nodeModel.getId()].length; i++)
-                            table[nodeModel.getId()][i] = new LLCell(LLCell.RETURN, tokensInt.get(graphModel.getName()), "");
-                    });
-            if (graphModel.getName().equals("MAIN"))
+            if (graphModel.getName().equals("MAIN")) {
                 graphModel.getNodes().stream().filter(NodeModel::getFinal).
-                        forEach(nodeModel -> table[nodeModel.getId()][0] = new LLCell(LLCell.ACCEPT,-1, ""));
+                        forEach(nodeModel -> table[nodeModel.getId()][0] = new LLCell(LLCell.ACCEPT, -1, ""));
+            }else {
+                graphModel.getNodes().stream().filter(NodeModel::getFinal).
+                        forEach(nodeModel -> {
+                            for (int i = 0; i < table[nodeModel.getId()].length; i++)
+                                table[nodeModel.getId()][i] = new LLCell(LLCell.RETURN, tokensInt.get(graphModel.getName()), "");
+                        });
+            }
 
         }
 
