@@ -163,7 +163,9 @@ public class Controller
         FileChooser chooser = new FileChooser();
         chooser.setTitle("JavaFX Projects");
         chooser.getExtensionFilters().addAll(
-                new FileChooser.ExtensionFilter("PGEN Save File", "*.pgs"));
+                new FileChooser.ExtensionFilter("PGEN Save File (PGS)", "*.pgs")
+                ,new FileChooser.ExtensionFilter("ALL", "*")
+        );
         File selectedFile = chooser.showOpenDialog(pane.getScene().getWindow());
         if (selectedFile != null)
         {
@@ -179,7 +181,9 @@ public class Controller
         FileChooser chooser = new FileChooser();
         chooser.setTitle("JavaFX Projects");
         chooser.getExtensionFilters().addAll(
-                new FileChooser.ExtensionFilter("PGEN Save File", "*.pgs"));
+                new FileChooser.ExtensionFilter("PGEN Save File (PGS)", "*.pgs")
+                ,new FileChooser.ExtensionFilter("ALL", "*")
+        );
         File selectedFile = chooser.showSaveDialog(pane.getScene().getWindow());
         if (selectedFile != null)
         {
