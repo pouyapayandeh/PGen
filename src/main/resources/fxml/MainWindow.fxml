@@ -29,6 +29,7 @@
               <items>
                   <MenuItem mnemonicParsing="false" text="Renumber" onAction="#renumber"/>
                   <MenuItem fx:id="checkMenuItem" mnemonicParsing="false" text="Build Table" />
+                  <MenuItem fx:id="exportTableMenuItem" mnemonicParsing="false" text="Build Pretty Table" />
                   <MenuItem fx:id="exportMenuItem" mnemonicParsing="false" text="Export Functions" />
               </items>
             </Menu>

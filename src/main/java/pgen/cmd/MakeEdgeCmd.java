@@ -8,8 +8,9 @@ import pgen.model.NodeModel;
  */
 public class MakeEdgeCmd implements Command
 {
-    NodeModel start , end;
+    NodeModel start, end;
     EdgeModel edge;
+
     public MakeEdgeCmd(NodeModel start, NodeModel end)
     {
         this.start = start;
@@ -19,11 +20,10 @@ public class MakeEdgeCmd implements Command
     @Override
     public void apply()
     {
-        if(start != end)
-        {
-            edge = new EdgeModel(start, end);
-            start.getAdjacent().add(edge);
-        }
+
+        edge = new EdgeModel(start, end);
+        start.getAdjacent().add(edge);
+
     }
 
     @Override

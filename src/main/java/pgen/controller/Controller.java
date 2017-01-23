@@ -1,7 +1,6 @@
 package pgen.controller;
 
 import javafx.event.ActionEvent;
-import javafx.event.EventHandler;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
@@ -9,7 +8,6 @@ import javafx.scene.Scene;
 import javafx.scene.control.*;
 import javafx.scene.input.KeyCode;
 import javafx.scene.input.KeyEvent;
-import javafx.scene.input.ScrollEvent;
 import javafx.scene.layout.AnchorPane;
 import javafx.scene.layout.VBox;
 import javafx.stage.DirectoryChooser;
@@ -53,6 +51,7 @@ public class Controller
     public ScrollPane scrollpane;
     public Button addGraphBtn;
     public MenuItem aboutMenuItem;
+    public MenuItem exportTableMenuItem;
 
     DrawPaneController drawPaneController;
 
@@ -129,32 +128,56 @@ public class Controller
         exportMenuItem.setOnAction(this::export);
         saveMenuItem.setOnAction(this::save);
         loadMenuItem.setOnAction(this::load);
-        checkMenuItem.setOnAction(this::check);
+        checkMenuItem.setOnAction(this::build);
+        exportTableMenuItem.setOnAction(this::prettyTable);
         addGraphBtn.setOnAction(event -> list.getItems().addAll(new GraphModel("New Graph")));
     }
 
-    private void check(ActionEvent actionEvent)
+    private void build(ActionEvent actionEvent)
     {
+        renumber(null);
         LLParser parser = new LLParser();
         FileChooser chooser = new FileChooser();
-        chooser.setTitle("JavaFX Projects");
+        chooser.setTitle("Save Table To");
         chooser.getExtensionFilters().addAll(
                 new FileChooser.ExtensionFilter("npt File", "*.npt"));
         File selectedFile = chooser.showSaveDialog(pane.getScene().getWindow());
         if (selectedFile != null)
         {
             List<Message> msgs = parser.buildTable(list.getItems(), selectedFile);
-            if (msgs.size() > 0)
-            {
-                String msg = msgs.stream().map(message -> message.getMessage() + "\n").reduce(String::concat).get();
-                MessageAlert alert = new MessageAlert(Alert.AlertType.ERROR, msg, "Error");
-                alert.showAndWait();
-            } else
-            {
-                MessageAlert alert = new MessageAlert(Alert.AlertType.INFORMATION, "", "Success");
-                alert.showAndWait();
-            }
+            ShowMessages(msgs);
 
+        }
+    }
+
+    private void prettyTable(ActionEvent actionEvent)
+    {
+        renumber(null);
+        LLParser parser = new LLParser();
+        FileChooser chooser = new FileChooser();
+        chooser.setTitle("Save Pretty Table From");
+        chooser.getExtensionFilters().addAll(
+                new FileChooser.ExtensionFilter("prt File", "*.prt"));
+        File selectedFile = chooser.showSaveDialog(pane.getScene().getWindow());
+        if (selectedFile != null)
+        {
+            List<Message> msgs = parser.buildPrettyTable(list.getItems(), selectedFile);
+            ShowMessages(msgs);
+
+        }
+    }
+
+    private void ShowMessages(List<Message> msgs)
+    {
+        if (msgs.size() > 0)
+        {
+            String msg = msgs.stream().map(message -> message.getMessage() + "\n").reduce(String::concat).get();
+            MessageAlert alert = new MessageAlert(Alert.AlertType.ERROR, msg, "Error");
+            alert.showAndWait();
+        } else
+        {
+            MessageAlert alert = new MessageAlert(Alert.AlertType.INFORMATION, "", "Success");
+            alert.showAndWait();
         }
     }
 
@@ -178,6 +201,7 @@ public class Controller
 
     private void save(ActionEvent actionEvent)
     {
+        renumber(null);
         FileChooser chooser = new FileChooser();
         chooser.setTitle("JavaFX Projects");
         chooser.getExtensionFilters().addAll(

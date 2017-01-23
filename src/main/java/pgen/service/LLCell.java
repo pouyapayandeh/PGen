@@ -32,4 +32,24 @@ public class LLCell
     {
         return String.format("%d %d %s", action,target,func);
     }
+    public String getActionString()
+    {
+        switch (action)
+        {
+            case 0:
+                return "Error";
+            case 1:
+                return "SHIFT";
+            case 2:
+                return "GOTO";
+            case 3:
+                return "PUSH_GOTO";
+            case 4:
+                return "RETURN";
+            case 5:
+                return "ACCEPT";
+        }
+        return "";
+    }
+
 }
