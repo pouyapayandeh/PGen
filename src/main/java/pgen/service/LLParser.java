@@ -31,6 +31,7 @@ public class LLParser
 
         extractExpectedGraphs.removeAll(givenGraphs);
 
+
         extractExpectedGraphs.
                 forEach(s -> messages.add(new Message(Message.ERROR, String.format("Graph %s doesn't Exist", s))));
 
@@ -38,7 +39,6 @@ public class LLParser
                 filter(graph -> !graph.getNodes().stream().anyMatch(node -> node.getFinal())).collect(Collectors.toList());
         woFinals.
                 forEach(graph -> messages.add(new Message(Message.ERROR, String.format("Graph %s doesn't have final  Node", graph.getName()))));
-
         List<GraphModel> woStart = graphs.stream().
                 filter(graph -> graph.getStart() == null).collect(Collectors.toList());
         woStart.
@@ -51,6 +51,8 @@ public class LLParser
     public LLCell[][] buildTable(List<GraphModel> graphs, Map<String, Integer> tokensInt) throws TableException
     {
         List<Message> msgs = check(graphs);
+        if(msgs.size() > 0 )
+            throw new TableException(msgs);
         ArrayList<String> tokens = new ArrayList<>(graphs.stream().
                 flatMap(graph -> graph.getEdges().stream()).filter(edge -> !edge.getGraph()).
                 map(EdgeModel::getToken).collect(Collectors.toSet()));
@@ -79,15 +81,27 @@ public class LLParser
         int seti = 0;
         for (String s : tokens)
         {
-            tokensInt.put(s, seti);
+            if(tokensInt.put(s, seti) != null)
+            {
+                if(s.equals("$"))
+                    msgs.add(new Message(Message.ERROR, String.format("$ is a predefined Token")));
+                else
+                    msgs.add(new Message(Message.ERROR, String.format("%s Should be either a Token or a Graph", s)));
+            }
             seti++;
+
         }
 
         for (String s : vars)
         {
-            tokensInt.put(s, seti);
+            if(tokensInt.put(s, seti) != null)
+            {
+                msgs.add(new Message(Message.ERROR, String.format("%s Should be either a Token or a Graph", s)));
+            }
             seti++;
         }
+
+
         int tw = tokens.size() + vars.size();
         LLCell[][] table = new LLCell[nodes.size()][tw];
         for (int i = 0; i < table.length; i++)
@@ -173,7 +187,7 @@ public class LLParser
             }
         } catch (TableException e)
         {
-            e.printStackTrace();
+
             return e.getMsg();
         }
 
@@ -242,7 +256,6 @@ public class LLParser
             }
         } catch (TableException e)
         {
-            e.printStackTrace();
             return e.getMsg();
         }
 
@@ -272,8 +285,15 @@ public class LLParser
         Map<String, Set<String>> firsts = new HashMap<>();
         for (Map.Entry<String, GraphModel> entry : varGraph.entrySet())
         {
-            firsts.put(entry.getKey(), entry.getValue().getStart().getAdjacent().stream().filter(edgeModel -> !edgeModel.getGraph())
-                    .map(EdgeModel::getToken).collect(Collectors.toSet()));
+            try
+            {
+                firsts.put(entry.getKey(), entry.getValue().getStart().getAdjacent().stream().filter(edgeModel -> !edgeModel.getGraph())
+                        .map(EdgeModel::getToken).collect(Collectors.toSet()));
+            }catch (Exception e)
+            {
+                System.out.println("");
+            }
+
         }
         boolean flag = true;
         while (flag)
@@ -281,7 +301,7 @@ public class LLParser
             flag = false;
             for (Map.Entry<String, GraphModel> entry : varGraph.entrySet())
             {
-                for (EdgeModel edge : entry.getValue().getEdges())
+                for (EdgeModel edge : entry.getValue().getStart().getAdjacent())
                 {
                     if (edge.getGraph())
                     {
