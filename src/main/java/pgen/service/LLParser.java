@@ -13,6 +13,7 @@ import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.PrintWriter;
 import java.util.*;
+import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
 import static com.sun.xml.internal.fastinfoset.alphabet.BuiltInRestrictedAlphabets.table;
@@ -250,6 +251,103 @@ public class LLParser
                 String tableString = board.setInitialBlock(ta.tableToBlocks()).build().getPreview();
                 writer.println(tableString);
                 writer.println();
+            } catch (FileNotFoundException e)
+            {
+                e.printStackTrace();
+            }
+        } catch (TableException e)
+        {
+            return e.getMsg();
+        }
+
+        return new ArrayList<>();
+    }
+
+    public List<Message> buildCSVTable(List<GraphModel> graphs, File file)
+    {
+        Map<String, Integer> tokensInt = new HashMap<>();
+        try
+        {
+            LLCell[][] table = buildTable(graphs, tokensInt);
+            List<NodeModel> nodes = graphs.stream().
+                    flatMap(graphModel -> graphModel.getNodes().stream()).collect(Collectors.toList());
+            try (PrintWriter writer = new PrintWriter(file))
+            {
+                StringBuffer blocksText = new StringBuffer();
+                List<String> list = tokensInt.keySet().stream().sorted((o1, o2) -> tokensInt.get(o1) - tokensInt.get(o2)).collect(Collectors.toList());
+                List<String> headersList = new ArrayList<>(list);
+                headersList.add(0,"States");
+                int state = 0;
+                List<List<String>> rowsList = new ArrayList<>();
+                List<Integer> colAlignList = new ArrayList<>();
+                for (int i = 0; i < headersList.size(); i++)
+                {
+                    colAlignList.add(Block.DATA_CENTER);
+                }
+                for (LLCell[] llCells : table)
+                {
+                    List<String> row = new ArrayList<>();
+                    row.add(String.valueOf(state++));
+                    for (LLCell llCell : llCells)
+                    {
+                        String r = llCell.getActionString();
+                        if(llCell.action == LLCell.RETURN)
+                        {
+                            for(Map.Entry<String,Integer> pair : tokensInt.entrySet())
+                            {
+                                if(pair.getValue() == llCell.target)
+                                {
+                                    r += " " + pair.getKey();
+                                    break;
+                                }
+                            }
+
+                        }
+                        if(llCell.action == LLCell.GOTO || llCell.action == LLCell.PUSH_GOTO || llCell.action == LLCell.SHIFT)
+                            r+=" S" +llCell.target;
+                        if(llCell.action != LLCell.ERROR && llCell.action != LLCell.RETURN)
+                            r += " " +llCell.func;
+                        row.add(r);
+
+                    }
+                    rowsList.add(row);
+                }
+
+                Board board = new Board(headersList.size() * 120);
+                Table ta = new Table(board, headersList.size() * 120, headersList, rowsList);
+                ta.setColAlignsList(colAlignList);
+                String tableString = board.setInitialBlock(ta.tableToBlocks()).build().getPreview();
+                blocksText.append(tableString);
+                blocksText.append(System.lineSeparator());
+
+                Scanner sc = new Scanner(blocksText.toString());
+                boolean printedInLine = false;
+                while (sc.hasNext())
+                {
+                    String line = sc.nextLine();
+                    line = line.trim();
+                    if (line.equals("") || line.charAt(0) == '+')
+                        continue;
+                    String[] items = line.split(" {3,}" + Pattern.quote("|") + " {3,}" + "|" + Pattern.quote("|") + " {3,}" + "|" + " {3,}" + Pattern.quote("|"));
+                    if (items.length == 0)
+                        continue;
+
+                    for (String item : items)
+                    {
+                        String fixedItem = item.trim();
+                        if (fixedItem.equals(""))
+                            continue;
+                        fixedItem = (fixedItem.contains(",") ? "\"" + fixedItem + "\"" : fixedItem);
+                        if (printedInLine)
+                            writer.write(",");
+                        writer.write(fixedItem);
+                        printedInLine = true;
+                    }
+                    writer.write(System.lineSeparator());
+                    printedInLine = false;
+                }
+                writer.write(System.lineSeparator());
+
             } catch (FileNotFoundException e)
             {
                 e.printStackTrace();
