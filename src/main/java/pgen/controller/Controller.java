@@ -52,6 +52,7 @@ public class Controller
     public Button addGraphBtn;
     public MenuItem aboutMenuItem;
     public MenuItem exportTableMenuItem;
+    public MenuItem exportCSVTableMenuItem;
 
     DrawPaneController drawPaneController;
 
@@ -130,6 +131,7 @@ public class Controller
         loadMenuItem.setOnAction(this::load);
         checkMenuItem.setOnAction(this::build);
         exportTableMenuItem.setOnAction(this::prettyTable);
+        exportCSVTableMenuItem.setOnAction(this::csvTable);
         addGraphBtn.setOnAction(event -> list.getItems().addAll(new GraphModel("New Graph")));
     }
 
@@ -155,13 +157,30 @@ public class Controller
         renumber(null);
         LLParser parser = new LLParser();
         FileChooser chooser = new FileChooser();
-        chooser.setTitle("Save Pretty Table From");
+        chooser.setTitle("Save Pretty Table to");
         chooser.getExtensionFilters().addAll(
                 new FileChooser.ExtensionFilter("prt File", "*.prt"));
         File selectedFile = chooser.showSaveDialog(pane.getScene().getWindow());
         if (selectedFile != null)
         {
             List<Message> msgs = parser.buildPrettyTable(list.getItems(), selectedFile);
+            ShowMessages(msgs);
+
+        }
+    }
+
+    private void csvTable(ActionEvent actionEvent)
+    {
+        renumber(null);
+        LLParser parser = new LLParser();
+        FileChooser chooser = new FileChooser();
+        chooser.setTitle("Save CSV Table to");
+        chooser.getExtensionFilters().addAll(
+                new FileChooser.ExtensionFilter("csv File", "*.csv"));
+        File selectedFile = chooser.showSaveDialog(pane.getScene().getWindow());
+        if (selectedFile != null)
+        {
+            List<Message> msgs = parser.buildCSVTable(list.getItems(), selectedFile);
             ShowMessages(msgs);
 
         }
