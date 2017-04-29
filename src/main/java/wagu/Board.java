@@ -161,16 +161,19 @@ public class Board {
                     dataPoints[charr.getY()][charr.getX()] = newValue;
                 }
             }
-
+            StringBuilder builder = new StringBuilder();
             for (String[] dataPoint : dataPoints) {
                 for (String point : dataPoint) {
                     if (point == null) {
                         point = String.valueOf(Charr.S);
                     }
-                    preview = preview.concat(point);
+                    builder.append(point);
+//                    preview = preview.concat(point);
                 }
-                preview = preview.concat(String.valueOf(Charr.NL));
+//                preview = preview.concat(String.valueOf(Charr.NL));
+                    builder.append(String.valueOf(Charr.NL));
             }
+            preview =builder.toString();
         }
 
         return this;
