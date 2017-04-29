@@ -1,6 +1,9 @@
 package pgen.controller;
 
+import javafx.beans.Observable;
 import javafx.beans.property.StringProperty;
+import javafx.collections.FXCollections;
+import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
@@ -56,6 +59,7 @@ public class Controller
 
     DrawPaneController drawPaneController;
 
+    ObservableList<GraphModel> graphs  = FXCollections.observableArrayList();
     @FXML
     private void initialize()
     {
@@ -63,7 +67,8 @@ public class Controller
         CommandManager.init(drawPaneController);
         GraphModel graph = new GraphModel("MAIN");
         drawPaneController.graph = graph;
-        list.getItems().addAll(graph);
+        list.setItems(graphs);
+        graphs.addAll(graph);
         list.getSelectionModel().selectedItemProperty().addListener((observable, oldValue, newValue) ->
         {
             drawPaneController.graph = newValue;
@@ -144,7 +149,7 @@ public class Controller
         checkMenuItem.setOnAction(this::build);
         exportTableMenuItem.setOnAction(this::prettyTable);
         exportCSVTableMenuItem.setOnAction(this::csvTable);
-        addGraphBtn.setOnAction(event -> list.getItems().addAll(new GraphModel("New Graph")));
+        addGraphBtn.setOnAction(event ->graphs.addAll(new GraphModel("New Graph")));
     }
 
     private void build(ActionEvent actionEvent)
@@ -158,7 +163,7 @@ public class Controller
         File selectedFile = chooser.showSaveDialog(pane.getScene().getWindow());
         if (selectedFile != null)
         {
-            List<Message> msgs = parser.buildTable(list.getItems(), selectedFile);
+            List<Message> msgs = parser.buildTable(graphs, selectedFile);
             ShowMessages(msgs);
 
         }
@@ -175,7 +180,7 @@ public class Controller
         File selectedFile = chooser.showSaveDialog(pane.getScene().getWindow());
         if (selectedFile != null)
         {
-            List<Message> msgs = parser.buildPrettyTable(list.getItems(), selectedFile);
+            List<Message> msgs = parser.buildPrettyTable(graphs, selectedFile);
             ShowMessages(msgs);
 
         }
@@ -192,7 +197,7 @@ public class Controller
         File selectedFile = chooser.showSaveDialog(pane.getScene().getWindow());
         if (selectedFile != null)
         {
-            List<Message> msgs = parser.buildCSVTable(list.getItems(), selectedFile);
+            List<Message> msgs = parser.buildCSVTable(graphs, selectedFile);
             ShowMessages(msgs);
 
         }
@@ -243,7 +248,7 @@ public class Controller
         if (selectedFile != null)
         {
             SaveLoadService exportService = new SaveLoadService(selectedFile);
-            exportService.save(list.getItems());
+            exportService.save(graphs);
         }
     }
 
@@ -256,7 +261,7 @@ public class Controller
         if (selectedDirectory != null)
         {
             ExportService exportService = new ExportService(selectedDirectory);
-            exportService.exportGraphs(list.getItems());
+            exportService.exportGraphs(graphs);
             MessageAlert alert = new MessageAlert(Alert.AlertType.INFORMATION, "", "Success");
             alert.showAndWait();
 
