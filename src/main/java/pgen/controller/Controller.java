@@ -1,5 +1,6 @@
 package pgen.controller;
 
+import javafx.beans.property.StringProperty;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
@@ -37,7 +38,6 @@ public class Controller
     public ListView<GraphModel> list;
     @FXML
     public AnchorPane pane;
-    public AnchorPane pane2;
     @FXML
     public VBox mainContainer;
     @FXML
@@ -71,14 +71,26 @@ public class Controller
         });
         list.setCellFactory(param ->
         {
-            ListCell<GraphModel> cell = new ListCell<>();
+            ListCell<GraphModel> cell = new ListCell<GraphModel>()
+            {
+                @Override
+                protected void updateItem(GraphModel item, boolean empty) {
+                    super.updateItem(item, empty);
+                    if (empty || item == null ) {
+                        setText(null);
+                    } else {
+                        textProperty().bind(item.nameProperty());
+                    }
+                }
+            };
+
             ContextMenu contextMenu = new ContextMenu();
             MenuItem deleteBtn = new MenuItem("Delete");
             MenuItem renameBtn = new MenuItem("Rename");
 //
             deleteBtn.setOnAction(event -> {
 
-                cell.getListView().getItems().remove(cell.getIndex());
+                cell.getListView().getItems().remove(cell.getItem());
             });
             renameBtn.setOnAction(event ->
             {
@@ -89,6 +101,7 @@ public class Controller
                 result.ifPresent(s -> cell.getItem().setName(s));
             });
             contextMenu.getItems().addAll(deleteBtn, renameBtn);
+           // cell.textProperty().bind(cell.itemProperty());
             cell.emptyProperty().addListener((obs, wasEmpty, isNowEmpty) -> {
                 if (isNowEmpty)
                 {
@@ -108,7 +121,6 @@ public class Controller
                         renameBtn.setDisable(true);
                     }
                     cell.setContextMenu(contextMenu);
-                    cell.textProperty().bind(cell.getItem().nameProperty());
                 }
             });
             return cell;
