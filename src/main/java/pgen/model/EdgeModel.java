@@ -99,8 +99,17 @@ public class EdgeModel
         this.start = start;
         this.end = end;
         anchorX = new SimpleDoubleProperty((start.x.get() + end.x.get()) /2) ;
-
         anchorY = new SimpleDoubleProperty((start.y.get() + end.y.get()) /2);
+
+        if(start == end)
+        {
+            int pad = 40;
+            anchorX = new SimpleDoubleProperty((start.x.get())) ;
+            if(start.y.get() > 4.0/3.0 * pad)
+                anchorY = new SimpleDoubleProperty((start.y.get() -pad));
+            else
+                anchorY = new SimpleDoubleProperty((start.y.get() +pad));
+        }
         token = new SimpleStringProperty("");
         func = new SimpleStringProperty("");
         graph = new SimpleBooleanProperty(false);

@@ -1,5 +1,9 @@
 package pgen.controller;
 
+import javafx.beans.Observable;
+import javafx.beans.property.StringProperty;
+import javafx.collections.FXCollections;
+import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
@@ -37,7 +41,6 @@ public class Controller
     public ListView<GraphModel> list;
     @FXML
     public AnchorPane pane;
-    public AnchorPane pane2;
     @FXML
     public VBox mainContainer;
     @FXML
@@ -56,6 +59,7 @@ public class Controller
 
     DrawPaneController drawPaneController;
 
+    ObservableList<GraphModel> graphs  = FXCollections.observableArrayList();
     @FXML
     private void initialize()
     {
@@ -63,7 +67,8 @@ public class Controller
         CommandManager.init(drawPaneController);
         GraphModel graph = new GraphModel("MAIN");
         drawPaneController.graph = graph;
-        list.getItems().addAll(graph);
+        list.setItems(graphs);
+        graphs.addAll(graph);
         list.getSelectionModel().selectedItemProperty().addListener((observable, oldValue, newValue) ->
         {
             drawPaneController.graph = newValue;
@@ -71,14 +76,26 @@ public class Controller
         });
         list.setCellFactory(param ->
         {
-            ListCell<GraphModel> cell = new ListCell<>();
+            ListCell<GraphModel> cell = new ListCell<GraphModel>()
+            {
+                @Override
+                protected void updateItem(GraphModel item, boolean empty) {
+                    super.updateItem(item, empty);
+                    if (empty || item == null ) {
+                        setText(null);
+                    } else {
+                        textProperty().bind(item.nameProperty());
+                    }
+                }
+            };
+
             ContextMenu contextMenu = new ContextMenu();
             MenuItem deleteBtn = new MenuItem("Delete");
             MenuItem renameBtn = new MenuItem("Rename");
 //
             deleteBtn.setOnAction(event -> {
 
-                cell.getListView().getItems().remove(cell.getIndex());
+                cell.getListView().getItems().remove(cell.getItem());
             });
             renameBtn.setOnAction(event ->
             {
@@ -89,6 +106,7 @@ public class Controller
                 result.ifPresent(s -> cell.getItem().setName(s));
             });
             contextMenu.getItems().addAll(deleteBtn, renameBtn);
+           // cell.textProperty().bind(cell.itemProperty());
             cell.emptyProperty().addListener((obs, wasEmpty, isNowEmpty) -> {
                 if (isNowEmpty)
                 {
@@ -108,7 +126,6 @@ public class Controller
                         renameBtn.setDisable(true);
                     }
                     cell.setContextMenu(contextMenu);
-                    cell.textProperty().bind(cell.getItem().nameProperty());
                 }
             });
             return cell;
@@ -132,7 +149,7 @@ public class Controller
         checkMenuItem.setOnAction(this::build);
         exportTableMenuItem.setOnAction(this::prettyTable);
         exportCSVTableMenuItem.setOnAction(this::csvTable);
-        addGraphBtn.setOnAction(event -> list.getItems().addAll(new GraphModel("New Graph")));
+        addGraphBtn.setOnAction(event ->graphs.addAll(new GraphModel("New Graph")));
     }
 
     private void build(ActionEvent actionEvent)
@@ -146,7 +163,7 @@ public class Controller
         File selectedFile = chooser.showSaveDialog(pane.getScene().getWindow());
         if (selectedFile != null)
         {
-            List<Message> msgs = parser.buildTable(list.getItems(), selectedFile);
+            List<Message> msgs = parser.buildTable(graphs, selectedFile);
             ShowMessages(msgs);
 
         }
@@ -163,7 +180,7 @@ public class Controller
         File selectedFile = chooser.showSaveDialog(pane.getScene().getWindow());
         if (selectedFile != null)
         {
-            List<Message> msgs = parser.buildPrettyTable(list.getItems(), selectedFile);
+            List<Message> msgs = parser.buildPrettyTable(graphs, selectedFile);
             ShowMessages(msgs);
 
         }
@@ -180,7 +197,7 @@ public class Controller
         File selectedFile = chooser.showSaveDialog(pane.getScene().getWindow());
         if (selectedFile != null)
         {
-            List<Message> msgs = parser.buildCSVTable(list.getItems(), selectedFile);
+            List<Message> msgs = parser.buildCSVTable(graphs, selectedFile);
             ShowMessages(msgs);
 
         }
@@ -231,7 +248,7 @@ public class Controller
         if (selectedFile != null)
         {
             SaveLoadService exportService = new SaveLoadService(selectedFile);
-            exportService.save(list.getItems());
+            exportService.save(graphs);
         }
     }
 
@@ -244,7 +261,7 @@ public class Controller
         if (selectedDirectory != null)
         {
             ExportService exportService = new ExportService(selectedDirectory);
-            exportService.exportGraphs(list.getItems());
+            exportService.exportGraphs(graphs);
             MessageAlert alert = new MessageAlert(Alert.AlertType.INFORMATION, "", "Success");
             alert.showAndWait();
 
