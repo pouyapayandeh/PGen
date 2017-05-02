@@ -1,7 +1,5 @@
 package pgen.service;
 
-import com.sun.xml.internal.fastinfoset.algorithm.IntegerEncodingAlgorithm;
-import com.sun.xml.internal.fastinfoset.util.DuplicateAttributeVerifier;
 import pgen.model.EdgeModel;
 import pgen.model.GraphModel;
 import pgen.model.NodeModel;
@@ -15,8 +13,6 @@ import java.io.PrintWriter;
 import java.util.*;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
-
-import static com.sun.xml.internal.fastinfoset.alphabet.BuiltInRestrictedAlphabets.table;
 
 /**
  * Created by Pouya Payandeh on 9/18/2016.
@@ -201,49 +197,19 @@ public class LLParser
         try
         {
             LLCell[][] table = buildTable(graphs, tokensInt);
-            List<NodeModel> nodes = graphs.stream().
-                    flatMap(graphModel -> graphModel.getNodes().stream()).collect(Collectors.toList());
             try (PrintWriter writer = new PrintWriter(file))
             {
-                List<String> list = tokensInt.keySet().stream().sorted((o1, o2) -> tokensInt.get(o1) - tokensInt.get(o2)).collect(Collectors.toList());
+                List<String> list = tokensInt.keySet().stream().sorted(Comparator.comparingInt(tokensInt::get)).collect(Collectors.toList());
                 List<String> headersList = new ArrayList<>(list);
                 headersList.add(0,"States");
                 writer.println();
-                int state = 0;
-                List<List<String>> rowsList = new ArrayList<>();
                 List<Integer> colAlignList = new ArrayList<>();
                 for (int i = 0; i < headersList.size(); i++)
                 {
                     colAlignList.add(Block.DATA_CENTER);
                 }
-                for (LLCell[] llCells : table)
-                {
-                    List<String> row = new ArrayList<>();
-                    row.add(String.valueOf(state++));
-                    for (LLCell llCell : llCells)
-                    {
-                        String r = llCell.getActionString();
-                        if(llCell.action == LLCell.RETURN)
-                        {
-                            for(Map.Entry<String,Integer> pair : tokensInt.entrySet())
-                            {
-                                if(pair.getValue() == llCell.target)
-                                {
-                                    r += " " + pair.getKey();
-                                    break;
-                                }
-                            }
-
-                        }
-                        if(llCell.action == LLCell.GOTO || llCell.action == LLCell.PUSH_GOTO || llCell.action == LLCell.SHIFT)
-                            r+=" S" +llCell.target;
-                        if(llCell.action != LLCell.ERROR && llCell.action != LLCell.RETURN)
-                            r += " " +llCell.func;
-                        row.add(r);
-
-                    }
-                    rowsList.add(row);
-                }
+                List<List<String>> rowsList = BuildStringTable(tokensInt, table);
+                BuildStringTable(tokensInt, table);
 
                 Board board = new Board(headersList.size()*30);
                 Table ta = new Table(board, headersList.size() * 30, headersList, rowsList);
@@ -263,55 +229,59 @@ public class LLParser
         return new ArrayList<>();
     }
 
+    private List<List<String>> BuildStringTable(Map<String, Integer> tokensInt, LLCell[][] table)
+    {
+        int state = 0;
+        List<List<String>> rowsList = new ArrayList<>();
+        for (LLCell[] llCells : table)
+        {
+            List<String> row = new ArrayList<>();
+            row.add(String.valueOf(state++));
+            for (LLCell llCell : llCells)
+            {
+                String r = llCell.getActionString();
+                if(llCell.action == LLCell.RETURN)
+                {
+                    for(Map.Entry<String,Integer> pair : tokensInt.entrySet())
+                    {
+                        if(pair.getValue() == llCell.target)
+                        {
+                            r += " " + pair.getKey();
+                            break;
+                        }
+                    }
+
+                }
+                if(llCell.action == LLCell.GOTO || llCell.action == LLCell.PUSH_GOTO || llCell.action == LLCell.SHIFT)
+                    r+=" S" +llCell.target;
+                if(llCell.action != LLCell.ERROR && llCell.action != LLCell.RETURN)
+                    r += " " +llCell.func;
+                row.add(r);
+
+            }
+            rowsList.add(row);
+        }
+        return rowsList;
+    }
+
     public List<Message> buildCSVTable(List<GraphModel> graphs, File file)
     {
         Map<String, Integer> tokensInt = new HashMap<>();
         try
         {
             LLCell[][] table = buildTable(graphs, tokensInt);
-            List<NodeModel> nodes = graphs.stream().
-                    flatMap(graphModel -> graphModel.getNodes().stream()).collect(Collectors.toList());
             try (PrintWriter writer = new PrintWriter(file))
             {
                 StringBuffer blocksText = new StringBuffer();
-                List<String> list = tokensInt.keySet().stream().sorted((o1, o2) -> tokensInt.get(o1) - tokensInt.get(o2)).collect(Collectors.toList());
+                List<String> list = tokensInt.keySet().stream().sorted(Comparator.comparingInt(tokensInt::get)).collect(Collectors.toList());
                 List<String> headersList = new ArrayList<>(list);
                 headersList.add(0,"States");
-                int state = 0;
-                List<List<String>> rowsList = new ArrayList<>();
                 List<Integer> colAlignList = new ArrayList<>();
                 for (int i = 0; i < headersList.size(); i++)
                 {
                     colAlignList.add(Block.DATA_CENTER);
                 }
-                for (LLCell[] llCells : table)
-                {
-                    List<String> row = new ArrayList<>();
-                    row.add(String.valueOf(state++));
-                    for (LLCell llCell : llCells)
-                    {
-                        String r = llCell.getActionString();
-                        if(llCell.action == LLCell.RETURN)
-                        {
-                            for(Map.Entry<String,Integer> pair : tokensInt.entrySet())
-                            {
-                                if(pair.getValue() == llCell.target)
-                                {
-                                    r += " " + pair.getKey();
-                                    break;
-                                }
-                            }
-
-                        }
-                        if(llCell.action == LLCell.GOTO || llCell.action == LLCell.PUSH_GOTO || llCell.action == LLCell.SHIFT)
-                            r+=" S" +llCell.target;
-                        if(llCell.action != LLCell.ERROR && llCell.action != LLCell.RETURN)
-                            r += " " +llCell.func;
-                        row.add(r);
-
-                    }
-                    rowsList.add(row);
-                }
+                List<List<String>> rowsList = BuildStringTable(tokensInt, table);
 
                 Board board = new Board(headersList.size() * 120);
                 Table ta = new Table(board, headersList.size() * 120, headersList, rowsList);
