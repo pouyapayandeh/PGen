@@ -26,7 +26,7 @@ import java.io.IOException;
 /**
  * Created by Pouya Payandeh on 7/10/2016.
  */
-public class BoundLine extends QuadCurve
+public class BoundLine extends CubicCurve
 {
     Anchor anchor;
     Text text;
@@ -119,15 +119,40 @@ public class BoundLine extends QuadCurve
     {
 
 
-        double x1 = 2*edge.getAnchorX() - getStartX()/2 - getEndX()/2;
-        double y1 = 2*edge.getAnchorY() - getStartY()/2 - getEndY()/2;
+//        double x1 = 2*edge.getAnchorX() - getStartX()/2 - getEndX()/2;
+//        double y1 = 2*edge.getAnchorY() - getStartY()/2 - getEndY()/2;
 
-        controlXProperty().setValue(x1);
-        controlYProperty().setValue(y1);
+        double x1 = 4.0/3.0*(edge.getAnchorX() - 1.0/8.0*(getStartX() + getEndX()));
+        double y1 = 4.0/3.0*(edge.getAnchorY() - 1.0/8.0*(getStartY() + getEndY()));
 
 
+        controlX1Property().setValue(x1);
+        controlY1Property().setValue(y1);
 
-        Point2D ori = eval(this, (float) 0.5);
+        controlX2Property().setValue(x1);
+        controlY2Property().setValue(y1);
+
+        if(edge.getStart() == edge.getEnd())
+        {
+            double Ax = x1*2;
+            double Ay = y1*2;
+            x1 = (Ax+Ay)/2.0-(getStartY());
+            y1 = (Ay-Ax)/2.0+(getStartX());
+
+            controlX1Property().setValue(x1);
+            controlY1Property().setValue(y1);
+
+            double xc = getStartX() + getStartY() - y1;
+            double yc = getStartY() -(getStartX() - x1);
+            controlX2Property().setValue(xc);
+            controlY2Property().setValue(yc);
+        }
+        System.out.println("Anchor " + edge.getAnchorX() + " " +edge.getAnchorY());
+        System.out.println("Control " + x1 + " " +y1);
+
+        Point2D ori = eval(this, 0.5);
+
+        System.out.println("Ori " + ori.getX()+ " " +ori.getY());
         anchor.setCenterX(ori.getX());
         anchor.setCenterY(ori.getY());
 
@@ -167,7 +192,7 @@ public class BoundLine extends QuadCurve
      * @param t param between 0 and 1
      * @return a Point2D
      */
-    private Point2D eval(QuadCurve c, float t)
+    private Point2D eval(QuadCurve c, double t)
     {
         Point2D p = new Point2D(Math.pow(1 - t, 2) * c.getStartX() +
                 2 * t * (1 - t) * c.getControlX() +
@@ -185,10 +210,35 @@ public class BoundLine extends QuadCurve
      * @param t param between 0 and 1
      * @return a Point2D
      */
-    private Point2D evalDt(QuadCurve c, float t)
+    private Point2D evalDt(QuadCurve c, double t)
     {
         Point2D p = new Point2D(2*(1-t)*(c.getControlX()-c.getStartX())+ 2*(t)*(c.getEndX()-c.getControlX()),
                 2*(1-t)*(c.getControlY()-c.getStartY())+ 2*(t)*(c.getEndY()-c.getControlY()));
+        return p;
+    }
+
+    private Point2D eval(CubicCurve c, double t)
+    {
+        Point2D p = new Point2D(Math.pow(1 - t, 3) * c.getStartX() +
+                3 * t * Math.pow(1 - t, 2) * c.getControlX1() +
+                3 * (1 - t) * t * t * c.getControlX2() +
+                Math.pow(t, 3) * c.getEndX(),
+                Math.pow(1 - t, 3) * c.getStartY() +
+                        3 * t * Math.pow(1 - t, 2) * c.getControlY1() +
+                        3 * (1 - t) * t * t * c.getControlY2() +
+                        Math.pow(t, 3) * c.getEndY());
+        return p;
+    }
+    private Point2D evalDt(CubicCurve c, double t)
+    {
+        Point2D p = new Point2D(-3 * Math.pow(1 - t, 2) * c.getStartX() +
+                3 * (Math.pow(1 - t, 2) - 2 * t * (1 - t)) * c.getControlX1() +
+                3 * ((1 - t) * 2 * t - t * t) * c.getControlX2() +
+                3 * Math.pow(t, 2) * c.getEndX(),
+                -3 * Math.pow(1 - t, 2) * c.getStartY() +
+                        3 * (Math.pow(1 - t, 2) - 2 * t * (1 - t)) * c.getControlY1() +
+                        3 * ((1 - t) * 2 * t - t * t) * c.getControlY2() +
+                        3 * Math.pow(t, 2) * c.getEndY());
         return p;
     }
     public Text getText()
