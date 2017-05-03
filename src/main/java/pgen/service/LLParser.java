@@ -435,8 +435,8 @@ public class LLParser
                         Set<String> first = firsts.get(entry.getKey());
                         Set<String> first2 = firsts.get(edge.getToken());
 
-                        first2.addAll(firsts.get("$"+edge.getStart().getId()));
-                        firsts.get("$"+edge.getStart().getId()).addAll(first2);
+                        first.addAll(firsts.get("$"+edge.getStart().getId()));
+                        firsts.get("$"+edge.getStart().getId()).addAll(first);
 
 
                         if (first.addAll(first2))
@@ -510,8 +510,8 @@ public class LLParser
                         Set<String> follow = follows.get(entry.getKey());
                         Set<String> follow2 = follows.get(edge.getToken());
 
-                        follow2.addAll(firsts.get("$"+edge.getStart().getId()));
-                        firsts.get("$"+edge.getStart().getId()).addAll(follow2);
+                        follow.addAll(follows.get("$"+edge.getStart().getId()));
+                        follows.get("$"+edge.getStart().getId()).addAll(follow);
 
 
                         Set<String> first3 = firsts.get("$" + edge.getEnd().getId());
