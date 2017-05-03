@@ -45,7 +45,10 @@ public class GraphModel
 
     public void setStart(NodeModel start)
     {
+        if(this.start != null)
+            this.start.setStart(false);
         this.start = start;
+        start.setStart(true);
     }
 
     public List<NodeModel> getNodes()

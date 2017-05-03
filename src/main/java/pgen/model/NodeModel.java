@@ -18,6 +18,23 @@ public class NodeModel
     List<EdgeModel> adjacent = new ArrayList<>();
     DoubleProperty y = new SimpleDoubleProperty();
     BooleanProperty final_ = new SimpleBooleanProperty(false);
+
+    public boolean isStart()
+    {
+        return start.get();
+    }
+
+    public BooleanProperty startProperty()
+    {
+        return start;
+    }
+
+    public void setStart(boolean start)
+    {
+        this.start.set(start);
+    }
+
+    BooleanProperty start = new SimpleBooleanProperty(false);
     GraphModel graph;
     int id;
 

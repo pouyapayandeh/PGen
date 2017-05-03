@@ -50,7 +50,7 @@ public class GraphNode extends StackPane
 
         circle.setFill(color.deriveColor(1, 1, 1,1));
         circle.setStroke(color);
-        circle.setStrokeWidth(2);
+        circle.setStrokeWidth(3);
         circle.setStrokeType(StrokeType.OUTSIDE);
 
         setLayoutX(n.getX() -radius);
@@ -65,6 +65,14 @@ public class GraphNode extends StackPane
         {
             circle.setFill(color.deriveColor(1, 1, 1,1));
         }
+        if(n.getGraph() != null && n.getGraph().getStart() ==n)
+        {
+            circle.setStroke(Color.GREEN);
+        }else
+        {
+            circle.setStroke(color);
+        }
+
         n.finalProperty().addListener((observable, oldValue, newValue) ->
         {
             if(newValue)
@@ -73,6 +81,17 @@ public class GraphNode extends StackPane
             }else
             {
                 circle.setFill(color.deriveColor(1, 1, 1,1));
+            }
+        });
+
+        n.startProperty().addListener((observable, oldValue, newValue) ->
+        {
+            if(newValue)
+            {
+                circle.setStroke(Color.GREEN);
+            }else
+            {
+                circle.setStroke(color);
             }
         });
         text = new Text(String.valueOf(n.getId()));
