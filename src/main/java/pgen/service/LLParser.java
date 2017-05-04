@@ -155,6 +155,8 @@ public class LLParser
 //
                             if(firsts.get("$"+edge.getEnd().getId()).contains(EPSILON))
                             {
+                                if(node.getId() == 274)
+                                    System.out.println("HERTE");
                                 follows.get("$"+node.getId()).forEach(ss ->
                                         {
                                             if (table[node.getId()][tokensInt.get(ss)].action == LLCell.PUSH_GOTO ||
@@ -512,10 +514,14 @@ public class LLParser
 
                         follow.addAll(follows.get("$"+edge.getStart().getId()));
                         follows.get("$"+edge.getStart().getId()).addAll(follow);
-
+//                        if(edge.getToken().equals("__expr"))
+//                            System.out.println("hre");
 
                         Set<String> first3 = firsts.get("$" + edge.getEnd().getId());
+                        Set<String> follow3 = follows.get("$" + edge.getEnd().getId());
 
+                        if(follow3.addAll(follow))
+                            flag = true;
                         if (follow2.addAll(first3))
                         {
                             flag = true;
