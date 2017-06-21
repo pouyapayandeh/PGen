@@ -64,7 +64,8 @@ public class SaveLoadService
                     graphModel.getNodes().add(node);
                 });
                 if(graph.start != -1)
-                    graphModel.setStart( graphModel.getNodes().stream().filter(nodeJSON -> nodeJSON.getId()==graph.start).findFirst().get());
+                    if(graphModel.getNodes().stream().anyMatch(nodeJSON -> nodeJSON.getId()==graph.start))
+                        graphModel.setStart( graphModel.getNodes().stream().filter(nodeJSON -> nodeJSON.getId()==graph.start).findFirst().get());
                 graph.edges.forEach(edgeJSON ->
                 {
                     NodeModel start = nodes.get(edgeJSON.start);

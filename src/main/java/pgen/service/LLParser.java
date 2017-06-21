@@ -138,6 +138,11 @@ public class LLParser
                 {
                     table[node.getId()][tokensInt.get(edge.getToken())] = new LLCell(LLCell.GOTO, edge.getEnd().getId(), edge.getFunc());
                     Set<String> first = firsts.get(edge.getToken());
+                    if(first.contains(EPSILON))
+                    {
+                        first = new HashSet<>(first);
+                        first.addAll(firsts.get("$"+edge.getEnd().getId()));
+                    }
                     first.forEach(s ->
                     {
                         if (!s.equals(EPSILON))
@@ -147,14 +152,18 @@ public class LLParser
                                 msgs.add(new Message(Message.ERROR, String.format("First Set Collision in node %d and token \"%s\"", node.getId(), s)));
                             table[node.getId()][tokensInt.get(s)] = new LLCell(LLCell.PUSH_GOTO, varGraph.get(edge.getToken()).getStart().getId(), "");
 
+
                         } else
                         {
 //                            for (int i = 0; i < table[node.getId()].length; i++)
 //                                if (table[node.getId()][i].action == LLCell.ERROR)
 //                                    table[node.getId()][i] = new LLCell(LLCell.PUSH_GOTO, varGraph.get(edge.getToken()).getStart().getId(), "");
 //
-                            if(firsts.get("$"+edge.getEnd().getId()).contains(EPSILON))
+
+                           if(firsts.get("$"+edge.getEnd().getId()).contains(EPSILON))
                             {
+                                if(node.getId() == 274)
+                                    System.out.println("HERTE");
                                 follows.get("$"+node.getId()).forEach(ss ->
                                         {
                                             if (table[node.getId()][tokensInt.get(ss)].action == LLCell.PUSH_GOTO ||
@@ -412,6 +421,7 @@ public class LLParser
                 firsts.put(entry.getKey(), entry.getValue().getStart().getAdjacent().stream().filter(edgeModel -> !edgeModel.getGraph())
                         .map(EdgeModel::getToken).collect(Collectors.toSet()));
                 nameNode.put(entry.getKey(), entry.getValue().getStart());
+
             } catch (Exception e)
             {
                 System.out.println("");
@@ -428,25 +438,32 @@ public class LLParser
             {
                 for (EdgeModel edge : entry.getValue().getAdjacent())
                 {
+                    Set<String> first = firsts.get(entry.getKey());
+                    first.addAll(firsts.get("$"+edge.getStart().getId()));
+                    firsts.get("$"+edge.getStart().getId()).addAll(first);
 
                     if (edge.getGraph())
                     {
 
-                        Set<String> first = firsts.get(entry.getKey());
-                        Set<String> first2 = firsts.get(edge.getToken());
-
+//                        Set<String> first = firsts.get(entry.getKey());
                         first.addAll(firsts.get("$"+edge.getStart().getId()));
                         firsts.get("$"+edge.getStart().getId()).addAll(first);
 
 
-                        if (first.addAll(first2))
-                            flag = true;
+                        Set<String> first2 = new HashSet<>(firsts.get(edge.getToken()));
+                        Set<String> first3 = firsts.get("$" + edge.getEnd().getId());
                         if (first2.contains(EPSILON))
                         {
-                            Set<String> first3 = firsts.get("$" + edge.getEnd().getId());
+                          //  first3.remove(EPSILON);
                             if (first.addAll(first3))
                                 flag = true;
                         }
+                        first2.remove(EPSILON);
+                        if (first.addAll(first2))
+                            flag = true;
+
+
+
                     }
                 }
             }
@@ -504,17 +521,21 @@ public class LLParser
             {
                 for (EdgeModel edge : entry.getValue().getAdjacent())
                 {
-
+                    Set<String> follow = follows.get(entry.getKey());
+                    follow.addAll(follows.get("$"+edge.getStart().getId()));
+                    follows.get("$"+edge.getStart().getId()).addAll(follow);
                     if (edge.getGraph())
                     {
-                        Set<String> follow = follows.get(entry.getKey());
+//                        Set<String> follow = follows.get(entry.getKey());
                         Set<String> follow2 = follows.get(edge.getToken());
 
-                        follow.addAll(follows.get("$"+edge.getStart().getId()));
-                        follows.get("$"+edge.getStart().getId()).addAll(follow);
-
+//                        follow.addAll(follows.get("$"+edge.getStart().getId()));
+//                        follows.get("$"+edge.getStart().getId()).addAll(follow);
+//                        if(edge.getToken().equals("__expr"))
+//                            System.out.println("hre");
 
                         Set<String> first3 = firsts.get("$" + edge.getEnd().getId());
+                        Set<String> follow3 = follows.get("$" + edge.getEnd().getId());
 
                         if (follow2.addAll(first3))
                         {
@@ -522,7 +543,6 @@ public class LLParser
                         }
                         if (first3.contains(EPSILON))
                         {
-
                             if (follow2.addAll(follow))
                                 flag = true;
                         }
