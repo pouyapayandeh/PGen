@@ -50,6 +50,8 @@ public class Controller
     @FXML
     public MenuItem saveMenuItem;
     @FXML
+    public MenuItem saveSortedMenuItem;
+    @FXML
     public MenuItem loadMenuItem;
     public ScrollPane scrollpane;
     public Button addGraphBtn;
@@ -145,6 +147,7 @@ public class Controller
         mainContainer.addEventHandler(KeyEvent.KEY_RELEASED, event -> drawPaneController.firstNode = null);
         exportMenuItem.setOnAction(this::export);
         saveMenuItem.setOnAction(this::save);
+        saveSortedMenuItem.setOnAction(this::saveSorted);
         loadMenuItem.setOnAction(this::load);
         checkMenuItem.setOnAction(this::build);
         exportTableMenuItem.setOnAction(this::prettyTable);
@@ -249,6 +252,23 @@ public class Controller
         {
             SaveLoadService exportService = new SaveLoadService(selectedFile);
             exportService.save(graphs);
+        }
+    }
+
+    private void saveSorted(ActionEvent actionEvent)
+    {
+        renumber(null);
+        FileChooser chooser = new FileChooser();
+        chooser.setTitle("JavaFX Projects");
+        chooser.getExtensionFilters().addAll(
+                new FileChooser.ExtensionFilter("PGEN Save File (PGS)", "*.pgs")
+                ,new FileChooser.ExtensionFilter("ALL", "*")
+        );
+        File selectedFile = chooser.showSaveDialog(pane.getScene().getWindow());
+        if (selectedFile != null)
+        {
+            SaveLoadService exportService = new SaveLoadService(selectedFile);
+            exportService.saveSorted(graphs);
         }
     }
 

@@ -44,6 +44,35 @@ public class SaveLoadService
         }
 
     }
+    class GraphJSONComparator implements Comparator<GraphJSON> {
+
+        @Override
+        public int compare(GraphJSON mg1, GraphJSON mg2) {
+            if (mg1.name.equals(mg2.name)) return 0;
+            if (mg1.name.equals("MAIN")) return -1;
+            if (mg2.name.equals("MAIN")) return 1;
+            return mg1.name.compareTo(mg2.name);
+        }
+    }
+    public void saveSorted(List<GraphModel> graphs)
+    {
+        List<GraphJSON> graphJSONs = graphs.stream().map(GraphJSON::new).collect(Collectors.toList());
+        graphJSONs.sort(new GraphJSONComparator());
+        Gson gson = new GsonBuilder().setPrettyPrinting().create();
+        String out = gson.toJson(graphJSONs);
+        PrintWriter writer = null;
+        try
+        {
+            writer = new PrintWriter(file);
+            System.out.println("File Saved");
+            writer.print(out);
+            writer.close();
+        } catch (FileNotFoundException e)
+        {
+            e.printStackTrace();
+        }
+
+    }
     public void load(ListView<GraphModel> list)
     {
         Gson gson = new GsonBuilder().setPrettyPrinting().create();
